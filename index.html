@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>The Family Tapestry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Marcellus+SC&family=Caveat:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --parch:#f3ead7; --ink:#3d2f1c; --ink2:#6e5a3e; --line:#5a4520;
+  --olive:#8e8e52; --sage:#c9c79e; --sage2:#bdb993; --apricot:#f2c48d; --terra:#b9672f;
+  --gold:#d4af5c; --gold2:#b8913f; --cream:#fbf4e4;
+  --panel:rgba(251,244,228,.95);
+  --serif:'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --caps:'Marcellus SC', 'Cormorant Garamond', Georgia, serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--parch);color:var(--ink);font-family:var(--serif)}
+#cv{position:fixed;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;display:block}
+#cv.drag{cursor:grabbing}
+button{font-family:inherit;color:inherit}
+.corner{position:fixed;width:min(130px,18vw);pointer-events:none;z-index:2;opacity:.9}
+.corner.tl{top:6px;left:6px}
+.corner.tr{top:6px;right:6px;transform:scaleX(-1)}
+
+/* toolbar */
+.bar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:5;display:flex;align-items:center;gap:12px;
+  padding:7px 8px 7px 14px;background:var(--panel);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:2px solid var(--line);border-radius:40px;box-shadow:0 6px 22px rgba(61,47,28,.16);max-width:calc(100vw - 20px)}
+.brand{display:flex;align-items:center;gap:8px;font-family:var(--caps);font-size:19px;letter-spacing:.05em;white-space:nowrap}
+.brand img{height:34px;width:auto;margin:-4px 0}
+.seg{display:flex;background:rgba(142,142,82,.16);border-radius:30px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;padding:6px 14px;border-radius:24px;font-size:15.5px;font-weight:700;cursor:pointer;white-space:nowrap;color:var(--ink2)}
+.seg button[aria-pressed=true]{background:var(--line);color:var(--cream)}
+.tog{display:flex;align-items:center;gap:7px;border:0;background:transparent;font-size:15px;font-weight:600;color:var(--ink2);cursor:pointer;white-space:nowrap;padding:4px 6px}
+.tog i{width:34px;height:20px;border-radius:12px;background:#d9d2bd;border:1.5px solid var(--line);position:relative;transition:background .2s}
+.tog i:after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:var(--cream);border:1.5px solid var(--line);transition:left .2s}
+.tog[aria-pressed=true] i{background:var(--olive)}
+.tog[aria-pressed=true] i:after{left:15px}
+.search{position:relative}
+.search input{width:210px;border:1.5px solid var(--line);background:rgba(255,255,255,.55);border-radius:24px;padding:7px 12px 7px 32px;font:600 15px var(--serif);color:var(--ink);outline:none}
+.search input:focus{background:#fff}
+.search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%)}
+.results{position:absolute;top:calc(100% + 8px);right:0;width:340px;max-height:60vh;overflow:auto;background:var(--panel);
+  border:2px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(61,47,28,.2);padding:6px;display:none}
+.results.on{display:block}
+.results button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:7px 10px;border-radius:9px;cursor:pointer}
+.results button:hover,.results button.hl{background:rgba(201,199,158,.45)}
+.results .n{font-weight:700;font-size:16px}
+.results .m{font-size:13.5px;color:var(--ink2)}
+.results .empty{padding:10px;color:var(--ink2);font-style:italic}
+
+/* controls */
+.zoom{position:fixed;right:16px;bottom:186px;z-index:5;display:flex;flex-direction:column;gap:7px}
+.zoom button{width:42px;height:42px;border-radius:50%;border:2px solid var(--line);background:var(--panel);cursor:pointer;font-size:21px;display:grid;place-items:center;box-shadow:0 3px 12px rgba(61,47,28,.14)}
+.zoom button:hover{background:#fff}
+.mini{position:fixed;right:16px;bottom:16px;z-index:5;border:2px solid var(--line);border-radius:12px;background:var(--panel);padding:5px;box-shadow:0 6px 20px rgba(61,47,28,.15);cursor:pointer}
+.mini canvas{display:block;border-radius:7px}
+.legend{position:fixed;left:16px;bottom:16px;z-index:4;display:flex;gap:14px;flex-wrap:wrap;align-items:center;font-size:14px;color:var(--ink2);
+  background:rgba(243,234,215,.88);padding:7px 12px;border-radius:14px;border:1px solid rgba(90,69,32,.3);max-width:calc(100vw - 330px)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend b{width:16px;height:12px;border-radius:4px;border:1.5px solid var(--line);display:inline-block}
+.legend em{font-family:'Caveat',cursive;font-style:normal;font-size:17px;color:#8a4b22}
+
+/* panel */
+.panel{position:fixed;top:0;right:0;bottom:0;width:min(410px,100vw);z-index:6;background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-left:2px solid var(--line);box-shadow:-10px 0 30px rgba(61,47,28,.16);transform:translateX(105%);transition:transform .35s cubic-bezier(.2,.8,.2,1);overflow:auto}
+.panel.on{transform:none}
+.panel .inner{padding:0 26px 60px;position:relative}
+.panel .phead{position:sticky;top:0;z-index:3;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin:0 -26px;padding:6px 16px 10px 6px;
+  background:rgba(251,244,228,.97);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid rgba(90,69,32,.22)}
+.panel .phead .pc{width:92px;height:auto;justify-self:start;pointer-events:none;opacity:.9}
+.panel .phead .badge{justify-self:center}
+.panel .close{justify-self:end;width:38px;height:38px;border-radius:50%;border:2px solid var(--line);background:var(--cream);cursor:pointer;padding:0;display:grid;place-items:center}
+.panel .close:hover{background:#fff}
+.panel .close svg{display:block}
+.badge{display:inline-block;font-family:var(--caps);font-size:12.5px;letter-spacing:.1em;padding:3px 11px;border-radius:12px;border:1.5px solid var(--line)}
+.panel h1{font-weight:700;font-size:30px;line-height:1.08;margin:18px 0 4px}
+.panel .span{font-size:17px;color:var(--ink2);font-style:italic}
+.facts{margin:16px 0 0;padding:0;list-style:none;border-top:1.5px solid rgba(90,69,32,.35)}
+.facts li{padding:10px 0;border-bottom:1px solid rgba(90,69,32,.18);display:grid;grid-template-columns:78px 1fr;gap:8px;font-size:17px}
+.facts .k{font-family:var(--caps);font-size:12.5px;letter-spacing:.1em;color:var(--gold2);padding-top:4px}
+.note{margin-top:14px;font-family:'Caveat',cursive;font-size:21px;color:#8a4b22;line-height:1.15;background:rgba(242,196,141,.22);border-radius:10px;padding:8px 12px}
+.note small{display:block;font-family:var(--caps);font-size:11.5px;letter-spacing:.1em;color:var(--ink2)}
+.panel h3{font-family:var(--caps);font-weight:400;font-size:14px;letter-spacing:.12em;color:var(--ink2);margin:22px 0 8px;display:flex;align-items:center;gap:8px}
+.panel h3:after{content:"";flex:1;height:1px;background:rgba(90,69,32,.3)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1.5px solid var(--line);background:var(--cream);border-radius:18px;padding:5px 11px 5px 9px;font-size:15px;font-weight:700;cursor:pointer;text-align:left;display:inline-flex;align-items:center;gap:6px;max-width:100%}
+.chip small{font-weight:500;color:var(--ink2)}
+.chip i{width:10px;height:10px;border-radius:3px;border:1.2px solid var(--line);flex:none}
+.chip:hover{background:#fff}
+.chip[disabled]{opacity:.5;cursor:default}
+.links a{display:flex;align-items:center;gap:8px;margin:6px 0;padding:9px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--cream);text-decoration:none;color:var(--ink);font-size:15.5px;font-weight:700}
+.links a small{font-weight:500;color:var(--ink2)}
+.recs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.recs button{border:1.5px solid var(--line);border-radius:8px;padding:0;overflow:hidden;background:#fff;cursor:zoom-in;aspect-ratio:3/4}
+.recs img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.recs .ld{font-style:italic;color:var(--ink2);font-size:14px;grid-column:1/-1}
+
+.lb{position:fixed;inset:0;z-index:8;background:rgba(61,47,28,.6);display:none;place-items:center;padding:24px;cursor:zoom-out}
+.lb.on{display:grid}
+.lb figure{margin:0;background:var(--cream);padding:14px 14px 10px;border-radius:14px;border:2px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.35);max-width:min(560px,92vw);max-height:90vh;overflow:auto}
+.lb img{display:block;width:100%;height:auto;border-radius:8px}
+.lb figcaption{font-style:italic;color:var(--ink2);font-size:14.5px;margin-top:8px;text-align:center}
+
+.loading{position:fixed;inset:0;display:grid;place-items:center;z-index:9;background:var(--parch);transition:opacity .6s}
+.loading.off{opacity:0;pointer-events:none}
+.loading div{text-align:center;font-family:var(--caps);font-size:20px;letter-spacing:.1em;color:var(--ink2)}
+.loading img{width:220px;display:block;margin:0 auto 10px}
+.hint{position:fixed;top:78px;left:50%;transform:translateX(-50%);z-index:3;font-style:italic;font-size:15.5px;color:var(--ink2);background:rgba(251,244,228,.9);padding:5px 15px;border-radius:14px;border:1px solid rgba(90,69,32,.3);transition:opacity 1s;pointer-events:none;white-space:nowrap}
+
+@media (max-width:900px){
+  .brand span{display:none}
+  .search input{width:120px}
+  .legend,.mini{display:none}
+  .zoom{bottom:16px}
+  .bar{gap:6px;padding-left:8px;top:10px}
+  .seg button{padding:6px 9px;font-size:14px}
+  .tog span{display:none}
+  .hint{white-space:normal;width:86vw;text-align:center;font-size:14px;top:70px}
+  .corner{display:none}
+}
+@media (max-width:520px){.brand{display:none}.search input{width:104px;padding-left:28px}.seg button{padding:6px 8px}}
+</style>
+</head>
+<body>
+<canvas id="cv" aria-label="Family tree"></canvas>
+<img class="corner tl" src="orn/corner-gold.webp" alt="">
+<img class="corner tr" src="orn/corner-gold.webp" alt="">
+
+<div class="bar" role="toolbar">
+  <div class="brand"><img src="orn/flower.webp" alt=""><span>The Family Tapestry</span></div>
+  <div class="seg" id="treeSeg">
+    <button data-tree="kotze" aria-pressed="true">Kotzé &amp; Pieterse</button>
+    <button data-tree="tillett" aria-pressed="false">Tillett</button>
+  </div>
+  <button class="tog" id="sibTog" aria-pressed="true" title="Show brothers and sisters in each family"><i></i><span>Siblings</span></button>
+  <div class="search">
+    <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="#5a4520" stroke-width="1.8"/><path d="M11 11l4 4" stroke="#5a4520" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <input id="q" type="search" placeholder="Find a person…" autocomplete="off" aria-label="Search people">
+    <div class="results" id="results"></div>
+  </div>
+</div>
+<div class="hint" id="hint">Generations rise upward from you · drag to wander · tap anyone to meet them</div>
+
+<div class="zoom">
+  <button id="zin" title="Zoom in" aria-label="Zoom in">+</button>
+  <button id="zout" title="Zoom out" aria-label="Zoom out">−</button>
+  <button id="zhome" title="Back to Vivien &amp; Keith" aria-label="Back to the start">
+    <svg width="18" height="18" viewBox="0 0 18 18"><path d="M2 9l7-6 7 6M4 8v7h10V8" fill="none" stroke="#5a4520" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+  <button id="zfit" title="See the whole tree" aria-label="See the whole tree">
+    <svg width="16" height="16" viewBox="0 0 16 16"><path d="M1 5V1h4M11 1h4v4M15 11v4h-4M5 15H1v-4" fill="none" stroke="#5a4520" stroke-width="1.8"/></svg></button>
+</div>
+<div class="legend">
+  <span><b style="background:#c9c79e"></b>Fathers</span>
+  <span><b style="background:#f2c48d"></b>Mothers</span>
+  <span><b style="background:#fbf4e4"></b>Brothers &amp; sisters</span>
+  <span><svg width="14" height="17" viewBox="0 0 14 17" aria-hidden="true"><path d="M1 1h8l4 4v11H1z" fill="#fffaf0" stroke="#8a4b22" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 1v4h4M3.5 8h7M3.5 11h7M3.5 14h4" fill="none" stroke="#8a4b22" stroke-width="1.1"/></svg><em>Mom's note</em></span>
+</div>
+<div class="mini" id="mini" title="Tap to jump"><canvas id="mcv"></canvas></div>
+
+<aside class="panel" id="panel" aria-live="polite"><div class="inner" id="pinner"></div></aside>
+<div class="lb" id="lb" role="dialog" aria-label="Source record"><figure><img alt="Source record"><figcaption>One of Mom's source records · tap anywhere to close</figcaption></figure></div>
+<div class="loading" id="loading"><div><img src="orn/lady.webp" alt="">Weaving the family tapestry…</div></div>
+
+<script>
+(()=>{
+/* ================= constants ================= */
+const W=200,H=112,SG=16,FG=64,CG=120,RH=H+190,PAD=900;
+const COL={line:'#5a4520',olive:'#8e8e52',sage:'#c9c79e',apricot:'#f2c48d',cream:'#fbf4e4',gold:'#d4af5c',gold2:'#b8913f',ink:'#3d2f1c',ink2:'#6e5a3e',terra:'#b9672f'};
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const mcv=document.getElementById('mcv'),mctx=mcv.getContext('2d');
+let DPR=Math.min(devicePixelRatio||1,2),VW=0,VH=0;
+const view={x:0,y:0,s:1};
+let dirty=true,anim=null,selected=null,hover=null,showSibs=true,tree='kotze';
+let T=null,L=null; // data, layout
+
+/* ================= ornaments ================= */
+const ORN={};['lady','corner-gold','divider','corner-calla','corner-lily','frame-vine','leaf','vine-bloom','vine-bloom2','garland','flower'].forEach(n=>{const im=new Image();im.onload=()=>dirty=true;im.src='orn/'+n+'.webp';ORN[n]=im});
+const ok=im=>im&&im.complete&&im.naturalWidth;
+
+/* ================= parsing ================= */
+const IDRE=/\b([A-Z0-9]{4}-[A-Z0-9]{3,4})\b/g,URLRE=/https?:\/\/\S+/g;
+function parsePerson(t){
+  let s=t.replace(URLRE,' ').replace(/\r/g,'');
+  s=s.replace(IDRE,' ');
+  s=s.replace(/[ \t]+(B[ \t]*[±\d?~c])/g,'\n$1').replace(/[ \t]*(†)/g,'\n$1');
+  const lines=s.split('\n').map(l=>l.replace(/\s+/g,' ').trim()).filter(l=>l&&l!=='-');
+  const name=(lines.shift()||'Unknown').replace(/[\s,;:-]+$/,'');
+  const facts=[],extra=[];let f=null;
+  for(const l of lines){
+    if(/^B\b/.test(l)){f={k:'Born',v:l.replace(/^B\s*/,'')};facts.push(f)}
+    else if(/^†/.test(l)){f={k:'Died',v:l.replace(/^†\s*/,'')};facts.push(f)}
+    else if(f&&f.v.length<90){f.v+=(f.v?', ':'')+l}
+    else extra.push(l);
+  }
+  facts.forEach(f=>{f.v=f.v.replace(/^[,\s]+/,'').replace(/\s+,/g,',')||'?'});
+  const by=(facts.find(f=>f.k==='Born')||{}).v||'',dy=(facts.find(f=>f.k==='Died')||{}).v||'';
+  const yr=v=>{const m=v.match(/\b(\d{3,4})\b/);return m?String(+m[1]):(v.includes('?')?'?':'')};
+  const byr=yr(by),dyr=yr(dy);
+  let span='';if(by||dy)span=(byr||'?')+' – '+(dyr||(dy?'?':''));
+  const place=(by.replace(/^[^A-Za-z]*\d{3,4}\.?\s*,?\s*/,'').replace(/^[±~\s.\d?]+/,'')||'').trim();
+  // short name pieces for small zoom
+  const clean=name.replace(/\(.*?\)/g,'').replace(/\s+/g,' ').trim();
+  const toks=clean.split(' ');
+  const maiden=(name.match(/\((?:nee|née)\s*([^)]+)\)/i)||[])[1];
+  const surname=(maiden||toks[toks.length-1]||'').trim();
+  return {name,facts,extra,span,place,by:+byr||null,surname};
+}
+const norm=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+
+/* ================= layout ================= */
+function layout(){
+  const P=T.persons,U=T.units,PU=T.pu,AP=T.asParent;
+  const nodes=[],fams=[],visited=new Set();
+  // block = {items, fams, cont: Map(level -> sorted [[a,b],...]), att}
+  function shift(b,dx){b.items.forEach(n=>n.x+=dx);b.cont.forEach(v=>v.forEach(iv=>{iv[0]+=dx;iv[1]+=dx}))}
+  function node(pid,lv,role,extra){const n={pid,lv,role,x:0,...extra};nodes.push(n);return n}
+  function leaf(pid,lv,role,dup){const n=node(pid,lv,role,{dup});return {items:[n],fams:[],cont:new Map([[lv,[[0,W]]]]),att:n}}
+  function sortKids(ids){return ids.map((p,i)=>({p,i,b:T.P[p].by||null})).sort((a,b)=>(a.b&&b.b)?a.b-b.b:a.i-b.i).map(o=>o.p)}
+  const lo=v=>v[0][0],hi=v=>v[v.length-1][1];
+  function merge(list){list.sort((x,y)=>x[0]-y[0]);const out=[];for(const iv of list){const l=out[out.length-1];if(l&&iv[0]<=l[1])l[1]=Math.max(l[1],iv[1]);else out.push([iv[0],iv[1]])}return out}
+  function union(a,b){const out={items:a.items.concat(b.items),fams:a.fams.concat(b.fams),cont:new Map()};
+    for(const m of [a.cont,b.cont])m.forEach((v,l)=>out.cont.set(l,merge((out.cont.get(l)||[]).concat(v.map(x=>[x[0],x[1]])))));return out}
+  function combine(a,b,lv,gapAtLv){ // place b to the right of a
+    let need=-Infinity;
+    b.cont.forEach((v,l)=>{const av=a.cont.get(l);if(av){const g=(l===lv&&gapAtLv!=null)?gapAtLv:FG;need=Math.max(need,hi(av)+g-lo(v))}});
+    if(need===-Infinity)need=0;shift(b,need);return union(a,b);
+  }
+  function conflict(a,b,dx){ // would b shifted by dx overlap a (interval-precise)?
+    for(const [l,v] of b.cont){const av=a.cont.get(l);if(!av)continue;
+      for(const x of v)for(const y of av)if(x[0]+dx<y[1]+FG&&x[1]+dx>y[0]-FG)return true}
+    return false;
+  }
+  function settle(a,b,desired){ // closest shift to `desired` with no overlap
+    if(!conflict(a,b,desired))return desired;
+    const cands=[];
+    for(const [l,v] of b.cont){const av=a.cont.get(l);if(!av)continue;
+      for(const x of v)for(const y of av){cands.push(y[1]+FG-x[0],y[0]-FG-x[1])}}
+    cands.sort((p,q)=>Math.abs(p-desired)-Math.abs(q-desired));
+    for(const c of cands)if(!conflict(a,b,c))return c;
+    return desired;
+  }
+  // descendants of someone who is not on the direct line (siblings' families, your brother's son…)
+  function desc(pid,lv,role){
+    const own=(AP[pid]||[]).filter(u=>!visited.has(u)&&U[u].desc);
+    const base=leaf(pid,lv,role);
+    if(!own.length)return base;
+    const u=own[0];visited.add(u);const un=U[u];
+    let blk=base;const pn=[base.att];
+    un.p.filter(x=>x!==pid).slice(0,1).forEach(sp=>{const sb=leaf(sp,lv,'P');blk=combine(blk,sb,lv,CG);pn.push(sb.att)});
+    const kids=sortKids(un.c);
+    let kb=null;
+    for(const k of kids){const d=desc(k,lv-1,'D');kb=kb?combine(kb,d,lv-1,SG):d}
+    const kn=kids.map(k=>kb.items.find(n=>n.pid===k&&n.lv===lv-1));
+    const mid=pn.length===2?(pn[0].x+W+pn[1].x)/2:pn[0].x+W/2;
+    shift(kb,mid-(kn[0].x+kn[kn.length-1].x+W)/2);
+    fams.push({u,lv:lv-1,parents:pn,kids:kn});
+    const out=union(blk,kb);out.fams.push(fams[fams.length-1]);out.att=base.att;return out;
+  }
+  function build(u,attach,side,lv,expandMask){
+    visited.add(u);
+    const un=U[u];
+    const pars=un.p.slice(0,2);
+    const pblocks=pars.map((pid,i)=>{
+      const role=pars.length===2?(i===0?'F':'M'):(T.persons[pid].k==='S'?'M':'F');
+      const pu=PU[pid];
+      const allowed=!expandMask||expandMask[i];
+      if(pu!=null&&allowed&&!visited.has(pu)){const b=build(pu,pid,pars.length===2?(i===0?'R':'L'):'R',lv+1,null);b.att.role=role;return b}
+      return leaf(pid,lv+1,role,pu!=null&&allowed&&visited.has(pu));
+    });
+    let pb=pblocks[0];
+    if(pblocks.length===2)pb=combine(pblocks[0],pblocks[1],lv+1,CG);
+    const pn=pblocks.map(b=>b.att);
+    // children row (level lv), each child carrying their own descendants
+    let kids=sortKids(un.c);
+    if(attach!=null){
+      if(!showSibs)kids=[attach];
+      kids=kids.filter(k=>k!==attach);
+      if(side==='R')kids.push(attach);else kids.unshift(attach);
+    }
+    let kb=null;
+    for(const k of kids){const d=k===attach?leaf(k,lv,'A'):desc(k,lv,attach==null?'R':'C');kb=kb?combine(kb,d,lv,SG):d}
+    const kn=kids.map(k=>kb.items.find(n=>n.pid===k&&n.lv===lv));
+    const mid=pn.length===2?(pn[0].x+W+pn[1].x)/2:pn[0].x+W/2;
+    const desired=mid-(kn[0].x+kn[kn.length-1].x+W)/2;
+    shift(kb,settle(pb,kb,desired));
+    const fam={u,lv,parents:pn,kids:kn};fams.push(fam);
+    const out=union(pb,kb);out.fams.push(fam);
+    out.att=attach!=null?kn.find(n=>n.pid===attach):null;
+    return out;
+  }
+  const mask=tree==='kotze'?[false,true]:[true,false];
+  build(T.root,null,null,0,mask);
+  // normalise
+  let minx=Infinity,maxx=-Infinity,maxlv=0,minlv=0;
+  nodes.forEach(n=>{minx=Math.min(minx,n.x);maxx=Math.max(maxx,n.x+W);maxlv=Math.max(maxlv,n.lv);minlv=Math.min(minlv,n.lv)});
+  nodes.forEach(n=>{n.x+=PAD-minx;n.y=PAD+(maxlv-n.lv)*RH});
+  const width=maxx-minx+PAD*2,height=(maxlv-minlv)*RH+H+PAD*2+600;
+  const byPid=new Map();nodes.forEach(n=>{if(!byPid.has(n.pid)||(!n.dup&&byPid.get(n.pid).dup))byPid.set(n.pid,n)});
+  const gens=[];for(let l=minlv;l<=maxlv;l++){const ys=nodes.filter(n=>n.lv===l&&(n.role==='F'||n.role==='M'||n.role==='R'||n.role==='A'||n.role==='D')).map(n=>T.P[n.pid].by).filter(Boolean).sort((a,b)=>a-b);
+    gens.push({lv:l,y:PAD+(maxlv-l)*RH,yr:ys.length?ys[Math.floor(ys.length/2)]:null})}
+  // spatial grid
+  const G=600,grid=new Map();nodes.forEach(n=>{for(let gx=Math.floor(n.x/G);gx<=Math.floor((n.x+W)/G);gx++){const k=gx+','+Math.floor(n.y/G);(grid.get(k)||grid.set(k,[]).get(k)).push(n)}});
+  // fam geometry
+  fams.forEach(f=>{
+    const p=f.parents,k=f.kids;
+    f.mx=p.length===2?(p[0].x+W+p[1].x)/2:p[0].x+W/2;
+    f.my=p[0].y+H/2;
+    f.barY=k[0].y-70;
+    f.x0=Math.min(k[0].x+W/2,f.mx);f.x1=Math.max(k[k.length-1].x+W/2,f.mx);
+    f.bx0=Math.min(f.x0,p[0].x)-40;f.bx1=Math.max(f.x1,p[p.length-1].x+W)+40;f.by0=p[0].y-20;f.by1=k[0].y+H+20;
+    f.marr=marrText(T.units[f.u].m);
+  });
+  const rootFam=fams.find(f=>f.u===T.root);
+  return {nodes,fams,width,height,maxlv,byPid,gens,grid,G,rootFam};
+}
+function marrText(m){
+  if(!m)return '';
+  let s=m.replace(/^(M\s*:?|Lived Together)\s*/i,'').replace(/\s+/g,' ').trim();
+  if(!s||s==='?'||/^unknown$/i.test(s))return '';
+  return s;
+}
+
+/* ================= view ================= */
+function resize(){VW=innerWidth;VH=innerHeight;cv.width=VW*DPR;cv.height=VH*DPR;dirty=true;buildMini()}
+function fitAll(animate=true){
+  const top=90,bot=30;const s=Math.min((VW-60)/L.width,(VH-top-bot)/L.height);
+  go({s,x:L.width/2-VW/2/s,y:L.height/2-(top+(VH-top-bot)/2)/s},animate);
+}
+function home(animate=true){
+  const f=L.rootFam;
+  // show root family + 2 generations
+  const s=Math.max(.3,Math.min(1,VH/(RH*3.2),VW/760));
+  const cx=f.mx,cy=f.kids[0].y-RH*0.9;
+  go(clampV({s,x:cx-VW/2/s,y:cy-VH/2/s}),animate);
+}
+const minS=()=>Math.min((VW-40)/L.width,(VH-120)/L.height)*0.9;
+function clampV(v){
+  v.s=Math.max(minS(),Math.min(2.2,v.s));
+  const vw=VW/v.s,vh=VH/v.s,m=0.45;
+  // keep world bounds covering a good part of the screen
+  const cx=v.x+vw/2,cy=v.y+vh/2;
+  const lo=x=>x,ccx=Math.max(Math.min(cx,L.width-Math.min(vw*m,L.width/2)),Math.min(vw*m,L.width/2));
+  const ccy=Math.max(Math.min(cy,L.height-Math.min(vh*m,L.height/2)),Math.min(vh*m,L.height/2));
+  const nx=L.width<vw?L.width/2:ccx, ny=L.height<vh?L.height/2:ccy;
+  v.x=nx-vw/2;v.y=ny-vh/2;return v;
+}
+function go(t,animate=true){
+  t=clampV({...t});
+  if(!animate){Object.assign(view,t);dirty=true;return}
+  const f={...view},t0=performance.now(),D=700;
+  anim=now=>{let k=Math.min(1,(now-t0)/D);k=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
+    const ls=Math.exp(Math.log(f.s)+(Math.log(t.s)-Math.log(f.s))*k);
+    const fcx=f.x+VW/2/f.s,fcy=f.y+VH/2/f.s,tcx=t.x+VW/2/t.s,tcy=t.y+VH/2/t.s;
+    view.s=ls;view.x=fcx+(tcx-fcx)*k-VW/2/ls;view.y=fcy+(tcy-fcy)*k-VH/2/ls;dirty=true;if(k>=1)anim=null};
+}
+function zoomAt(sx,sy,factor){
+  const ns=Math.max(minS(),Math.min(2.2,view.s*factor));
+  const wx=view.x+sx/view.s,wy=view.y+sy/view.s;
+  const v=clampV({s:ns,x:wx-sx/ns,y:wy-sy/ns});Object.assign(view,v);dirty=true;
+}
+function flyTo(n,openPanel){
+  const s=Math.max(view.s,0.75),pw=(VW>900&&openPanel)?410:0;
+  go({s,x:n.x+W/2-(VW-pw)/2/s,y:n.y+H/2-VH/2/s});
+}
+
+/* ================= drawing ================= */
+function frame(){if(anim)anim(performance.now());if(dirty&&L){dirty=false;draw()}requestAnimationFrame(frame)}
+const weave=(()=>{const c=document.createElement('canvas');c.width=c.height=6;const g=c.getContext('2d');
+  g.fillStyle='rgba(120,92,50,.07)';g.fillRect(0,0,6,1);g.fillRect(0,3,6,1);g.fillStyle='rgba(120,92,50,.05)';g.fillRect(0,0,1,6);g.fillRect(3,0,1,6);
+  g.fillStyle='rgba(255,255,255,.14)';g.fillRect(1,1,2,2);g.fillRect(4,4,2,2);return c})();
+let weavePat=null;
+const pathSet=new Set(); // highlighted direct path (node refs)
+function draw(){
+  const s=view.s;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.fillStyle='#f3ead7';ctx.fillRect(0,0,VW,VH);
+  if(!weavePat)weavePat=ctx.createPattern(weave,'repeat');ctx.fillStyle=weavePat;ctx.fillRect(0,0,VW,VH);
+  const vg=ctx.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.4,VW/2,VH/2,Math.max(VW,VH)*.8);
+  vg.addColorStop(0,'rgba(243,234,215,0)');vg.addColorStop(1,'rgba(150,110,60,.16)');ctx.fillStyle=vg;ctx.fillRect(0,0,VW,VH);
+
+  ctx.setTransform(DPR*s,0,0,DPR*s,-view.x*s*DPR,-view.y*s*DPR);
+  const x0=view.x,y0=view.y,x1=view.x+VW/s,y1=view.y+VH/s;
+  const vis=(a,b,c,d)=>c>=x0&&a<=x1&&d>=y0&&b<=y1;
+
+  // generation bands
+  L.gens.forEach((g,i)=>{if(i%2===0&&vis(0,g.y-RH/2+H/2,L.width,g.y+RH/2+H/2)){ctx.fillStyle='rgba(201,199,158,.10)';ctx.fillRect(0,g.y-(RH-H)/2,L.width,RH)}});
+
+  decorations(vis,s);
+
+  // families: connectors
+  ctx.lineCap='round';ctx.lineJoin='round';
+  const fl=[];for(const f of L.fams)if(vis(f.bx0,f.by0,f.bx1,f.by1))fl.push(f);
+  // pass 1: outlines, pass 2: fills (vine look)
+  for(const pass of [0,1]){
+    ctx.strokeStyle=pass?COL.olive:COL.line;ctx.lineWidth=pass?Math.max(3.4,1.4/s):Math.max(7,3/s);
+    ctx.beginPath();
+    for(const f of fl){
+      const k=f.kids;
+      // stem from medallion down to bar
+      const stemTop=f.parents.length===2?f.my+26:f.parents[0].y+H;
+      ctx.moveTo(f.mx,stemTop);ctx.lineTo(f.mx,f.barY);
+      if(k.length>1||Math.abs(k[0].x+W/2-f.mx)>1){ctx.moveTo(f.x0,f.barY);ctx.lineTo(f.x1,f.barY)}
+      for(const n of k){ctx.moveTo(n.x+W/2,f.barY);ctx.lineTo(n.x+W/2,n.y-4)}
+    }
+    ctx.stroke();
+  }
+  // highlighted path (gold)
+  if(pathSet.size){
+    ctx.strokeStyle=COL.gold;ctx.lineWidth=Math.max(4,2/s);ctx.beginPath();
+    for(const f of fl){const a=f.kids.find(n=>pathSet.has(n));if(!a)continue;
+      const stemTop=f.parents.length===2?f.my+26:f.parents[0].y+H;
+      ctx.moveTo(f.mx,stemTop);ctx.lineTo(f.mx,f.barY);ctx.lineTo(a.x+W/2,f.barY);ctx.lineTo(a.x+W/2,a.y-4)}
+    ctx.stroke();
+  }
+  // leaves at bar ends
+  if(s>0.12&&ok(ORN.leaf)){
+    for(const f of fl){if(f.x1-f.x0<40)continue;
+      leafAt(f.x0,f.barY,-1);leafAt(f.x1,f.barY,1)}
+  }
+  // couples: marriage bond
+  for(const f of fl){if(f.parents.length===2)bond(f,s)}
+  // people
+  for(const n of L.nodes){if(vis(n.x-10,n.y-20,n.x+W+10,n.y+H+10))card(n,s)}
+  // marriage text pills (after cards so they sit on top of stems)
+  if(s>0.55)for(const f of fl){if(f.parents.length===2&&(f.marr||T.units[f.u].rel==='partner'))marrPill(f,s)}
+  drawGenLabels(s);
+  drawMini();
+}
+function leafAt(x,y,dir){const im=ORN.leaf,h=46,w=h*im.naturalWidth/im.naturalHeight;
+  ctx.save();ctx.translate(x,y);ctx.rotate(dir*1.15);ctx.drawImage(im,-w/2,-h+4,w,h);ctx.restore()}
+function bond(f,s){
+  const a=f.parents[0],b=f.parents[1],y=f.my,r=24,partner=T.units[f.u].rel==='partner';
+  if(partner){
+    ctx.setLineDash([14,10]);ctx.strokeStyle=COL.line;ctx.lineWidth=Math.max(4,2/s);ctx.beginPath();ctx.moveTo(a.x+W,y);ctx.lineTo(b.x,y);ctx.stroke();ctx.setLineDash([]);
+    ctx.beginPath();ctx.arc(f.mx,y,r-4,0,7);ctx.fillStyle=COL.cream;ctx.fill();ctx.lineWidth=Math.max(3,1.4/s);ctx.strokeStyle=COL.line;ctx.stroke();
+    // a small heart for partners
+    ctx.fillStyle=COL.terra;ctx.beginPath();const hx=f.mx,hy=y+5;ctx.moveTo(hx,hy+3);ctx.bezierCurveTo(hx-13,hy-6,hx-7,hy-16,hx,hy-9);ctx.bezierCurveTo(hx+7,hy-16,hx+13,hy-6,hx,hy+3);ctx.fill();
+    return;
+  }
+  // double line between spouses
+  ctx.strokeStyle=COL.line;ctx.lineWidth=Math.max(6,2.6/s);ctx.beginPath();ctx.moveTo(a.x+W,y);ctx.lineTo(b.x,y);ctx.stroke();
+  ctx.strokeStyle=COL.gold;ctx.lineWidth=Math.max(3,1.2/s);ctx.beginPath();ctx.moveTo(a.x+W,y);ctx.lineTo(b.x,y);ctx.stroke();
+  // medallion
+  ctx.beginPath();ctx.arc(f.mx,y,r,0,7);ctx.fillStyle=COL.cream;ctx.fill();ctx.lineWidth=Math.max(3,1.4/s);ctx.strokeStyle=COL.line;ctx.stroke();
+  ctx.beginPath();ctx.arc(f.mx,y,r-5,0,7);ctx.lineWidth=Math.max(1.2,.6/s);ctx.strokeStyle=COL.gold2;ctx.stroke();
+  // interlocked rings
+  ctx.lineWidth=Math.max(3,1.2/s);
+  ctx.strokeStyle=COL.gold2;ctx.beginPath();ctx.arc(f.mx-5,y,8.5,0,7);ctx.stroke();
+  ctx.strokeStyle=COL.terra;ctx.beginPath();ctx.arc(f.mx+5,y,8.5,0,7);ctx.stroke();
+}
+function marrPill(f,s){
+  const t=T.units[f.u].rel==='partner'?'Partners':'Married '+f.marr;const fs=14;ctx.font=`italic 600 ${fs}px "Cormorant Garamond",Georgia,serif`;
+  const lines=wrap(t,250,2);const w=Math.max(...lines.map(l=>ctx.measureText(l).width))+22,h=lines.length*16+10;
+  const x=f.mx-w/2,y=f.my+38;
+  rr(x,y,w,h,h/2>14?12:h/2);ctx.fillStyle='rgba(251,244,228,.97)';ctx.fill();ctx.lineWidth=Math.max(1.4,.6/s);ctx.strokeStyle=COL.gold2;ctx.stroke();
+  ctx.fillStyle='#7a4a1c';ctx.textAlign='center';lines.forEach((l,i)=>ctx.fillText(l,f.mx,y+18+i*16));ctx.textAlign='left';
+}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function cardPath(x,y,w,h){const a=12,r=10;
+  ctx.beginPath();ctx.moveTo(x,y+a+r);ctx.quadraticCurveTo(x,y+a,x+r,y+a);
+  ctx.quadraticCurveTo(x+w/2,y-a*.9,x+w-r,y+a);ctx.quadraticCurveTo(x+w,y+a,x+w,y+a+r);
+  ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.closePath()}
+const wcache=new Map();
+function wrap(text,maxW,maxN){
+  const out=[];const words=text.split(' ');let line='';
+  for(const w of words){const t=line?line+' '+w:w;if(ctx.measureText(t).width>maxW&&line){out.push(line);line=w;if(out.length>=maxN)break}else line=t}
+  if(out.length<maxN&&line)out.push(line);
+  if(out.length===maxN){const usedWords=out.join(' ').split(' ').length;if(usedWords<words.length){let l=out[maxN-1];while(l.length>1&&ctx.measureText(l+'…').width>maxW)l=l.slice(0,-1);out[maxN-1]=l+'…'}}
+  return out;
+}
+function fill(n){return n.role==='F'?COL.sage:n.role==='M'?COL.apricot:COL.cream}
+function card(n,s){
+  const p=T.P[n.pid],sel=selected===n,hov=hover===n,onPath=pathSet.has(n);
+  const x=n.x,y=n.y,sw=W*s;
+  if(sw<9){ctx.fillStyle=fill(n);ctx.fillRect(x,y,W,H);ctx.lineWidth=2/s*0.6;ctx.strokeStyle=COL.line;ctx.strokeRect(x,y,W,H);return}
+  // shadow
+  ctx.fillStyle='rgba(61,47,28,.13)';cardPath(x+4,y+6,W,H);ctx.fill();
+  cardPath(x,y,W,H);ctx.fillStyle=fill(n);ctx.fill();
+  ctx.lineWidth=Math.max(sel?4.5:2.6,(sel?2.2:1.1)/s);ctx.strokeStyle=sel?COL.gold2:hov?COL.terra:COL.line;ctx.stroke();
+  if(onPath&&!sel){ctx.lineWidth=Math.max(3,1.2/s);ctx.strokeStyle=COL.gold;cardPath(x-5,y-5,W+10,H+10);ctx.stroke()}
+  if(n.role==='R'){ctx.lineWidth=Math.max(1.4,.6/s);ctx.strokeStyle=COL.gold2;cardPath(x+6,y+6,W-12,H-12);ctx.stroke()}
+  // text — always inside the card, sized for the zoom level
+  ctx.save();cardPath(x+3,y+3,W-6,H-6);ctx.clip();
+  ctx.fillStyle=COL.ink;
+  const pad=13,top=y+20;
+  if(s>=0.5){
+    ctx.font='700 17px "Cormorant Garamond",Georgia,serif';
+    const nl=wrap(p.name,W-pad*2,2);let yy=top+14;nl.forEach(l=>{ctx.fillText(l,x+pad,yy);yy+=17});
+    ctx.font='italic 600 15px "Cormorant Garamond",Georgia,serif';ctx.fillStyle=COL.ink2;
+    if(p.span){ctx.fillText(p.span,x+pad,yy+3);yy+=17}
+    if(p.place&&yy<y+H-10){ctx.font='500 13px "Cormorant Garamond",Georgia,serif';wrap(p.place,W-pad*2,1).forEach(l=>ctx.fillText(l,x+pad,yy+3))}
+  }else if(sw>=34){
+    // name scaled to fit, centred
+    const target=Math.min(28,12/s);
+    let fs=target;ctx.font=`700 ${fs}px "Cormorant Garamond",Georgia,serif`;
+    let lines=wrap(p.name,W-pad*2,s>=0.24?3:2);
+    const maxLines=Math.floor((H-28)/(fs*1.05));
+    if(lines.length>maxLines)lines=lines.slice(0,maxLines);
+    if(s<0.16){ // surname only, as large as fits
+      const sn=p.surname.toUpperCase();fs=Math.min(40,(W-pad*2)/Math.max(1,ctx.measureText(sn).width/fs)*0.98);
+      ctx.font=`700 ${fs}px "Cormorant Garamond",Georgia,serif`;ctx.textAlign='center';ctx.fillText(sn,x+W/2,y+H/2+fs*.38+5);ctx.textAlign='left';
+    }else{
+      const lh=fs*1.04,tot=lines.length*lh;let yy=y+(H-tot)/2+fs*.8+5;ctx.textAlign='center';
+      lines.forEach(l=>{ctx.fillText(l,x+W/2,yy);yy+=lh});ctx.textAlign='left';
+    }
+  }
+  ctx.restore();
+  // little markers
+  if(sw>40){
+    if(T.persons[n.pid].n)noteIcon(x+W-12,y+H-10,Math.max(1,0.45/s));
+    if(n.dup){ctx.font=`700 ${Math.max(14,7/s)}px "Cormorant Garamond",Georgia,serif`;ctx.fillStyle=COL.terra;ctx.fillText('↺',x+8,y+H-8)}
+  }
+}
+function noteIcon(r,b,k){ // little page with a folded corner, anchored bottom-right
+  const w=13*k,hh=16*k,f=4.5*k,x=r-w,y=b-hh;
+  ctx.save();ctx.lineJoin='round';ctx.lineWidth=1.4*k;
+  ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+w-f,y);ctx.lineTo(x+w,y+f);ctx.lineTo(x+w,y+hh);ctx.lineTo(x,y+hh);ctx.closePath();
+  ctx.fillStyle='#fffaf0';ctx.fill();ctx.strokeStyle='#8a4b22';ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x+w-f,y);ctx.lineTo(x+w-f,y+f);ctx.lineTo(x+w,y+f);ctx.stroke();
+  ctx.lineWidth=1.1*k;ctx.beginPath();for(let i=0;i<3;i++){const ly=y+f+2.5*k+i*3*k;ctx.moveTo(x+2.5*k,ly);ctx.lineTo(x+w-2.5*k-(i===2?3*k:0),ly)}ctx.stroke();
+  ctx.restore();
+}
+function decorations(vis,s){
+  const f=L.rootFam;if(!f)return;
+  // title cartouche below the root family; the lady (facing left) presents it from the right
+  const cx=f.mx,ty=Math.max(...L.nodes.map(n=>n.y))+H+120;
+  if(vis(cx-1000,ty-60,cx+1000,ty+560)){
+    ctx.textAlign='center';
+    ctx.fillStyle=COL.ink;ctx.font='400 56px "Marcellus SC","Cormorant Garamond",serif';
+    ctx.fillText(tree==='kotze'?'The Kotzé & Pieterse':'The Tillett',cx,ty+70);
+    ctx.font='italic 600 36px "Cormorant Garamond",Georgia,serif';ctx.fillStyle=COL.ink2;
+    ctx.fillText('family tapestry',cx,ty+116);
+    if(ok(ORN.divider)){const dw=420,dh=dw*ORN.divider.naturalHeight/ORN.divider.naturalWidth;ctx.drawImage(ORN.divider,cx-dw/2,ty+130,dw,dh)}
+    ctx.font='italic 500 23px "Cormorant Garamond",Georgia,serif';
+    ctx.fillText('Researched & recorded by Dorethea · '+(L.maxlv+1)+' generations · '+L.byPid.size+' people',cx,ty+250);
+    ctx.textAlign='left';
+    if(ok(ORN.lady)){const lh=470,lw=lh*ORN.lady.naturalWidth/ORN.lady.naturalHeight;ctx.drawImage(ORN.lady,cx+380,ty-40,lw,lh)}
+    if(ok(ORN['vine-bloom2'])){const h2=430,w2=h2*ORN['vine-bloom2'].naturalWidth/ORN['vine-bloom2'].naturalHeight;ctx.save();ctx.translate(cx-380,ty-30);ctx.scale(-1,1);ctx.drawImage(ORN['vine-bloom2'],0,0,w2,h2);ctx.restore()}
+  }
+  // garland arching over the oldest generation
+  const g=L.gens[L.gens.length-1];
+  if(ok(ORN.garland)&&g){const nodesTop=L.nodes.filter(n=>n.lv===g.lv);if(nodesTop.length){
+    const a=Math.min(...nodesTop.map(n=>n.x)),b=Math.max(...nodesTop.map(n=>n.x+W));const w=Math.min(2600,Math.max(1300,(b-a)+900)),h=w*ORN.garland.naturalHeight/ORN.garland.naturalWidth;
+    if(vis(a-w,g.y-h-200,b+w,g.y+H))ctx.drawImage(ORN.garland,(a+b)/2-w/2,g.y-h+H*0.7,w,h)}}
+}
+function drawGenLabels(s){
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  const rowPx=RH*s;if(rowPx<26)return;
+  const railW=VW<900?0:168;if(!railW)return;
+  const gr=ctx.createLinearGradient(0,0,railW,0);gr.addColorStop(0,'rgba(243,234,215,.97)');gr.addColorStop(.7,'rgba(243,234,215,.85)');gr.addColorStop(1,'rgba(243,234,215,0)');
+  ctx.fillStyle=gr;ctx.fillRect(0,0,railW,VH);
+  const step=rowPx<44?3:rowPx<70?2:1;
+  for(const g of L.gens){
+    if(g.lv%step)continue;
+    const sy=(g.y+H/2-view.y)*s;if(sy<130||sy>VH-70)continue;
+    const label=g.lv<0?'Next generation':g.lv===0?'You':g.lv===1?'Parents':g.lv===2?'Grandparents':g.lv===3?'Great-grandparents':(g.lv-2)+'× great-grandparents';
+    ctx.strokeStyle='rgba(90,69,32,.35)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(14,sy+18);ctx.lineTo(railW-40,sy+18);ctx.stroke();
+    ctx.fillStyle=COL.ink2;ctx.font='400 13px "Marcellus SC",serif';ctx.fillText(label,16,sy-2);
+    if(g.yr){ctx.font='italic 600 15px "Cormorant Garamond",serif';ctx.fillStyle=COL.gold2;ctx.fillText('c. '+g.yr,16,sy+14)}
+  }
+}
+function rrS(x,y,w,h,r){rr(x,y,w,h,r)}
+
+/* ================= minimap ================= */
+let miniImg=null,miniS=1;
+function buildMini(){
+  if(!L)return;const maxW=VW<900?0:220,maxH=150;if(!maxW){miniImg=null;return}
+  miniS=Math.min(maxW/L.width,maxH/L.height);const w=Math.ceil(L.width*miniS),h=Math.ceil(L.height*miniS);
+  mcv.width=w*DPR;mcv.height=h*DPR;mcv.style.width=w+'px';mcv.style.height=h+'px';
+  const c=document.createElement('canvas');c.width=w*DPR;c.height=h*DPR;const g=c.getContext('2d');
+  g.scale(DPR*miniS,DPR*miniS);g.fillStyle='#f6eedd';g.fillRect(0,0,L.width,L.height);
+  g.strokeStyle=COL.olive;g.lineWidth=2/miniS;g.beginPath();
+  L.fams.forEach(f=>{g.moveTo(f.mx,f.my);g.lineTo(f.mx,f.barY);g.moveTo(f.x0,f.barY);g.lineTo(f.x1,f.barY)});g.stroke();
+  L.nodes.forEach(n=>{g.fillStyle=n.role==='F'?'#9c9a6a':n.role==='M'?'#e0a160':'#d8ceb3';g.fillRect(n.x,n.y,W,H)});
+  miniImg=c;
+}
+function drawMini(){
+  if(!miniImg)return;mctx.setTransform(1,0,0,1,0,0);mctx.clearRect(0,0,mcv.width,mcv.height);mctx.drawImage(miniImg,0,0);
+  mctx.setTransform(DPR*miniS,0,0,DPR*miniS,0,0);mctx.lineWidth=2.5/miniS;mctx.strokeStyle=COL.terra;mctx.fillStyle='rgba(185,103,47,.12)';
+  const w=VW/view.s,h=VH/view.s;mctx.fillRect(view.x,view.y,w,h);mctx.strokeRect(view.x,view.y,w,h);
+}
+document.getElementById('mini').addEventListener('click',e=>{const r=mcv.getBoundingClientRect();
+  const wx=(e.clientX-r.left)/miniS,wy=(e.clientY-r.top)/miniS;go({s:view.s,x:wx-VW/2/view.s,y:wy-VH/2/view.s})});
+
+/* ================= hit test & input ================= */
+function hit(sx,sy){
+  const wx=view.x+sx/view.s,wy=view.y+sy/view.s;const list=L.grid.get(Math.floor(wx/L.G)+','+Math.floor(wy/L.G))||[];
+  const sl=6/view.s;for(const n of list)if(wx>=n.x-sl&&wx<=n.x+W+sl&&wy>=n.y-sl&&wy<=n.y+H+sl)return n;return null}
+const ptrs=new Map();let drag=null,moved=false,pinch=null;
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});anim=null;hideHint();
+  if(ptrs.size===1){drag={x:e.clientX,y:e.clientY,vx:view.x,vy:view.y};moved=false}
+  if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),s:view.s,wx:view.x+((a.x+b.x)/2)/view.s,wy:view.y+((a.y+b.y)/2)/view.s}}});
+cv.addEventListener('pointermove',e=>{
+  if(!ptrs.has(e.pointerId)){const n=hit(e.clientX,e.clientY);if(n!==hover){hover=n;cv.style.cursor=n?'pointer':'grab';dirty=true}return}
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size===2&&pinch){const [a,b]=[...ptrs.values()];const ns=pinch.s*Math.hypot(a.x-b.x,a.y-b.y)/pinch.d;const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+    const s2=Math.max(minS(),Math.min(2.2,ns));Object.assign(view,clampV({s:s2,x:pinch.wx-mx/s2,y:pinch.wy-my/s2}));moved=true;dirty=true;return}
+  if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>4){moved=true;cv.classList.add('drag')}
+    Object.assign(view,clampV({s:view.s,x:drag.vx-dx/view.s,y:drag.vy-dy/view.s}));dirty=true}});
+function endPtr(e){ptrs.delete(e.pointerId);cv.classList.remove('drag');if(ptrs.size<2)pinch=null;
+  if(ptrs.size===0){if(!moved&&drag&&e.type==='pointerup'){const n=hit(e.clientX,e.clientY);if(n)select(n,false);else closePanel()}drag=null}
+  else if(ptrs.size===1){const [a]=[...ptrs.values()];drag={x:a.x,y:a.y,vx:view.x,vy:view.y}}}
+cv.addEventListener('pointerup',endPtr);cv.addEventListener('pointercancel',endPtr);
+cv.addEventListener('wheel',e=>{e.preventDefault();anim=null;hideHint();
+  const mouseWheel=e.deltaMode!==0||(e.deltaX===0&&Math.abs(e.deltaY)>=40&&Number.isInteger(e.deltaY));
+  if(e.ctrlKey||mouseWheel)zoomAt(e.clientX,e.clientY,Math.exp(-e.deltaY*(e.ctrlKey?0.01:0.0018)*(e.deltaMode===1?30:1)));
+  else{Object.assign(view,clampV({s:view.s,x:view.x+e.deltaX/view.s,y:view.y+e.deltaY/view.s}));dirty=true}},{passive:false});
+cv.addEventListener('dblclick',e=>{const ns=Math.min(2.2,view.s*2);const wx=view.x+e.clientX/view.s,wy=view.y+e.clientY/view.s;go({s:ns,x:wx-e.clientX/ns,y:wy-e.clientY/ns})});
+const zc=f=>{const t=Math.max(minS(),Math.min(2.2,view.s*f));const cx=view.x+VW/2/view.s,cy=view.y+VH/2/view.s;go({s:t,x:cx-VW/2/t,y:cy-VH/2/t})};
+document.getElementById('zin').onclick=()=>zc(1.8);document.getElementById('zout').onclick=()=>zc(1/1.8);
+document.getElementById('zfit').onclick=()=>fitAll();document.getElementById('zhome').onclick=()=>{closePanel();home()};
+addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;const st=140/view.s;let v={...view};
+  if(e.key==='ArrowLeft')v.x-=st;else if(e.key==='ArrowRight')v.x+=st;else if(e.key==='ArrowUp')v.y-=st;else if(e.key==='ArrowDown')v.y+=st;
+  else if(e.key==='+'||e.key==='=')return zoomAt(VW/2,VH/2,1.3);else if(e.key==='-')return zoomAt(VW/2,VH/2,1/1.3);
+  else if(e.key==='Escape'){lb.classList.remove('on');return closePanel()}else return;Object.assign(view,clampV(v));dirty=true});
+addEventListener('resize',resize);
+setTimeout(hideHint,8000);function hideHint(){document.getElementById('hint').style.opacity=0}
+
+/* ================= panel ================= */
+const panel=document.getElementById('panel'),pinner=document.getElementById('pinner'),lb=document.getElementById('lb');
+lb.addEventListener('click',()=>lb.classList.remove('on'));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function relatives(pid){
+  const U=T.units,P=T.persons;const par=T.pu[pid]!=null?U[T.pu[pid]]:null;
+  const parents=par?par.p:[],sibs=par?par.c.filter(x=>x!==pid):[];
+  const spouses=[],kids=[];
+  (T.asParent[pid]||[]).forEach(ui=>{const u=U[ui];u.p.forEach(x=>{if(x!==pid&&!spouses.includes(x))spouses.push(x)});u.c.forEach(x=>{if(!kids.includes(x))kids.push(x)})});
+  return {parents,sibs,spouses,kids,parUnit:par,myUnits:(T.asParent[pid]||[]).map(ui=>U[ui])};
+}
+function chip(pid){const p=T.P[pid],n=L.byPid.get(pid);const sw=n?(n.role==='F'?'#c9c79e':n.role==='M'?'#f2c48d':'#fbf4e4'):'transparent';
+  return `<button class="chip" data-pid="${pid}" ${n?'':'disabled title="Not shown on this view"'}><i style="background:${sw}"></i>${esc(p.name.length>34?p.name.slice(0,33)+'…':p.name)} ${p.span?`<small>${esc(p.span)}</small>`:''}</button>`}
+function select(n,fly){
+  selected=n;pathSet.clear();
+  // path to root
+  let cur=n,guard=0;const parentOf=L.parentNode;while(cur&&guard++<200){pathSet.add(cur);cur=parentOf.get(cur)}
+  dirty=true;
+  const p=T.P[n.pid],raw=T.persons[n.pid],r=relatives(n.pid);
+  const role=n.role==='F'?['Father in the line','#c9c79e']:n.role==='M'?['Mother in the line','#f2c48d']:n.role==='R'?['Where it all leads','#fbf4e4']:n.role==='P'?['Married or partnered in','#fbf4e4']:n.role==='D'?['Next generation','#fbf4e4']:['Brother or sister','#fbf4e4'];
+  const lineFor=n.role==='A'||n.role==='F'||n.role==='M';
+  const recs=[];if(r.parUnit)recs.push(...r.parUnit.r);r.myUnits.forEach(u=>recs.push(...u.r));
+  const urecs=[...new Map(recs.map(x=>[x.join(':'),x])).values()].slice(0,9);
+  pinner.innerHTML=`<div class="phead"><img class="pc" src="orn/corner-calla.webp" alt=""><span class="badge" style="background:${role[1]}">${role[0]}</span>
+    <button class="close" aria-label="Close"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2l10 10M12 2L2 12" stroke="#5a4520" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+    <h1>${esc(p.name)}</h1>${p.span?`<div class="span">${esc(p.span)}</div>`:''}
+    <ul class="facts">${p.facts.map(f=>`<li><span class="k">${f.k}</span><span>${esc(f.v)}</span></li>`).join('')}
+    ${r.myUnits.map(u=>marrText(u.m)).filter(Boolean).slice(0,1).map(m=>`<li><span class="k">Married</span><span>${esc(m)}</span></li>`).join('')}
+    ${raw.ids.length?`<li><span class="k">Record</span><span>${raw.ids.map(esc).join(', ')}</span></li>`:''}</ul>
+    ${p.extra.length?`<div class="span" style="margin-top:10px;font-style:normal">${esc(p.extra.join(' · '))}</div>`:''}
+    ${(raw.n||[]).map(t=>`<div class="note"><small>Mom's note</small>${esc(t)}</div>`).join('')}
+    ${r.parents.length?`<h3>Parents</h3><div class="chips">${r.parents.map(chip).join('')}</div>`:''}
+    ${r.spouses.length?`<h3>${r.myUnits.some(u=>u.rel==='partner')?'Partner':'Married to'}</h3><div class="chips">${r.spouses.map(chip).join('')}</div>`:''}
+    ${r.kids.length?`<h3>Children</h3><div class="chips">${r.kids.map(chip).join('')}</div>`:''}
+    ${r.sibs.length?`<h3>Brothers &amp; sisters</h3><div class="chips">${r.sibs.map(chip).join('')}</div>`:''}
+    ${urecs.length?`<h3>Mom's source records</h3><div class="recs" id="recs"><div class="ld">Unrolling records…</div></div>`:''}
+    ${raw.ids.length?`<h3>FamilySearch</h3><div class="links">${raw.ids.map(i=>`<a href="https://www.familysearch.org/tree/person/details/${encodeURIComponent(i)}" target="_blank" rel="noopener">Open ${esc(i)} <small>on familysearch.org ↗</small></a>`).join('')}</div>`:''}
+    <img src="orn/corner-lily.webp" alt="" style="width:96px;display:block;margin:28px 0 0 auto;transform:scale(-1,-1);opacity:.9">`;
+  pinner.querySelector('.close').onclick=closePanel;
+  pinner.querySelectorAll('.chip[data-pid]').forEach(b=>b.onclick=()=>{const m=L.byPid.get(+b.dataset.pid);if(m){select(m,true)}});
+  if(urecs.length)loadRecs(urecs);
+  panel.classList.add('on');panel.scrollTop=0;
+  if(fly)flyTo(n,true);
+}
+function closePanel(){panel.classList.remove('on');selected=null;pathSet.clear();dirty=true}
+const recBundles={};
+async function bundle(pg){if(!recBundles[pg])recBundles[pg]=fetch('data/'+pg+'-records.json').then(r=>r.json()).catch(()=>({}));return recBundles[pg]}
+async function loadRecs(list){
+  const el=document.getElementById('recs');const imgs=[];
+  for(const [pg,img] of list){const b=await bundle(pg);if(b[img])imgs.push(b[img])}
+  if(document.getElementById('recs')!==el)return;
+  el.innerHTML=imgs.length?imgs.map((src,i)=>`<button data-i="${i}" aria-label="Open record"><img src="${src}" alt="Source record"></button>`).join(''):'<div class="ld">No records pinned here.</div>';
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{lb.querySelector('img').src=imgs[+b.dataset.i];lb.classList.add('on')});
+}
+
+/* ================= search ================= */
+const q=document.getElementById('q'),res=document.getElementById('results');let hits=[],hl=0;
+q.addEventListener('input',()=>{const v=norm(q.value);if(v.length<2){res.classList.remove('on');return}
+  const parts=v.split(' ');hits=[];
+  for(const [tk,lay] of Object.entries(LAYOUTS)){lay.byPid.forEach((n,pid)=>{const p=T.P[pid];if(parts.every(w=>p.n.includes(w)||T.persons[pid].ids.some(i=>i.toLowerCase().includes(w))))hits.push({tk,n,pid})})}
+  // prefer current tree, dedupe pid
+  const seen=new Set();hits=hits.sort((a,b)=>(b.tk===tree)-(a.tk===tree)||T.P[a.pid].n.length-T.P[b.pid].n.length).filter(h=>!seen.has(h.pid)&&seen.add(h.pid)).slice(0,40);hl=0;renderRes()});
+q.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){hl=Math.min(hl+1,hits.length-1);renderRes();e.preventDefault()}else if(e.key==='ArrowUp'){hl=Math.max(hl-1,0);renderRes();e.preventDefault()}
+  else if(e.key==='Enter'&&hits[hl])pick(hits[hl]);else if(e.key==='Escape'){res.classList.remove('on');q.blur()}});
+q.addEventListener('focus',()=>{if(q.value.length>1)res.classList.add('on')});
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('.search'))res.classList.remove('on')});
+function renderRes(){res.classList.add('on');if(!hits.length){res.innerHTML='<div class="empty">No one by that name yet…</div>';return}
+  res.innerHTML=hits.map((h,i)=>{const p=T.P[h.pid];return `<button class="${i===hl?'hl':''}" data-i="${i}"><div class="n">${esc(p.name)}</div><div class="m">${esc(p.span||'dates unknown')} · ${h.tk==='kotze'?'Kotzé & Pieterse':'Tillett'}${h.n.role==='C'?' · sibling':''}</div></button>`}).join('');
+  res.querySelectorAll('button').forEach(b=>b.onclick=()=>pick(hits[+b.dataset.i]))}
+function pick(h){res.classList.remove('on');q.blur();if(h.tk!==tree)setTree(h.tk,false);const n=L.byPid.get(h.pid);if(n)select(n,true)}
+
+/* ================= tree switching ================= */
+const LAYOUTS={};
+function setTree(tk,animate=true){
+  tree=tk;L=LAYOUTS[tk];selected=null;pathSet.clear();hover=null;panel.classList.remove('on');
+  document.querySelectorAll('#treeSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tree===tk));
+  buildMini();home(false);dirty=true;
+  try{history.replaceState(null,'','#'+tk)}catch(e){}
+}
+function relayout(){const keepSel=selected&&selected.pid;for(const tk of ['kotze','tillett']){tree=tk;LAYOUTS[tk]=prep(layout())}
+  tree=document.querySelector('#treeSeg button[aria-pressed=true]').dataset.tree;L=LAYOUTS[tree];buildMini();
+  if(keepSel!=null){const n=L.byPid.get(keepSel);if(n){select(n,true);return}}closePanel();}
+function prep(lay){
+  const famAsParent=new Map(),famOfKid=new Map();
+  lay.fams.forEach(f=>{f.parents.forEach(p=>famAsParent.set(p,f));f.kids.forEach(k=>famOfKid.set(k,f))});
+  const lineKid=f=>f.kids.find(k=>k.role==='F'||k.role==='M')||null;
+  lay.parentNode=new Map();
+  lay.nodes.forEach(n=>{let next=null;
+    if(n.role==='F'||n.role==='M'){const f=famAsParent.get(n);if(f)next=lineKid(f)}
+    else if(n.role==='C'){const f=famOfKid.get(n);if(f){const a=lineKid(f);next=a!==n?a:null}}
+    else if(n.role==='D'){const f=famOfKid.get(n);if(f)next=f.parents[0]}
+    else if(n.role==='P'){const f=famAsParent.get(n);if(f)next=f.parents[0]}
+    lay.parentNode.set(n,next)});
+  return lay;
+}
+document.querySelectorAll('#treeSeg button').forEach(b=>b.onclick=()=>setTree(b.dataset.tree));
+document.getElementById('sibTog').onclick=e=>{showSibs=!showSibs;e.currentTarget.setAttribute('aria-pressed',showSibs);const c={x:view.x+VW/2/view.s,y:view.y+VH/2/view.s};relayout();dirty=true;home(false)};
+addEventListener('hashchange',()=>{const k=location.hash.slice(1);if((k==='kotze'||k==='tillett')&&k!==tree)setTree(k)});
+
+/* ================= boot ================= */
+(async()=>{
+  resize();
+  T=await (await fetch('data/tree.json')).json();
+  T.P=T.persons.map(p=>{const o=parsePerson(p.t);o.n=norm(o.name);return o});
+  T.asParent={};T.units.forEach((u,ui)=>u.p.forEach(p=>(T.asParent[p]=T.asParent[p]||[]).push(ui)));
+  for(const tk of ['kotze','tillett']){tree=tk;LAYOUTS[tk]=prep(layout())}
+  const k=location.hash.slice(1);tree=(k==='tillett')?'tillett':'kotze';
+  setTree(tree,false);
+  if(document.fonts)document.fonts.ready.then(()=>dirty=true);
+  document.getElementById('loading').classList.add('off');
+  requestAnimationFrame(frame);
+})();
+})();
+</script>
+</body>
+</html>
