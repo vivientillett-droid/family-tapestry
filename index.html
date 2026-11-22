@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f3ead7">
+<meta name="description" content="An interactive family tree of the Kotzé & Pieterse and Tillett families.">
 <title>The Family Tapestry</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,6 +44,7 @@ button{font-family:inherit;color:inherit}
 .search{position:relative}
 .search input{width:210px;border:1.5px solid var(--line);background:rgba(255,255,255,.55);border-radius:24px;padding:7px 12px 7px 32px;font:600 15px var(--serif);color:var(--ink);outline:none}
 .search input:focus{background:#fff}
+.search input::placeholder{color:#6e5a3e;opacity:1}
 .search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%)}
 .results{position:absolute;top:calc(100% + 8px);right:0;width:340px;max-height:60vh;overflow:auto;background:var(--panel);
   border:2px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(61,47,28,.2);padding:6px;display:none}
@@ -77,7 +80,7 @@ button{font-family:inherit;color:inherit}
 .panel .close:hover{background:#fff}
 .panel .close svg{display:block}
 .badge{display:inline-block;font-family:var(--caps);font-size:12.5px;letter-spacing:.1em;padding:3px 11px;border-radius:12px;border:1.5px solid var(--line)}
-.panel h1{font-weight:700;font-size:30px;line-height:1.08;margin:18px 0 4px}
+.panel .pname{font-weight:700;font-size:30px;line-height:1.08;margin:18px 0 4px}
 .panel .span{font-size:17px;color:var(--ink2);font-style:italic}
 .facts{margin:16px 0 0;padding:0;list-style:none;border-top:1.5px solid rgba(90,69,32,.35)}
 .facts li{padding:10px 0;border-bottom:1px solid rgba(90,69,32,.18);display:grid;grid-template-columns:78px 1fr;gap:8px;font-size:17px}
@@ -120,7 +123,7 @@ button{font-family:inherit;color:inherit}
 
 @media (max-width:900px){
   .brand span{display:none}
-  .search input{width:120px}
+  .search input{width:170px;font-size:16px}
   .legend,.mini{display:none}
   .zoom{bottom:16px}
   .bar{gap:6px;padding-left:8px;top:10px}
@@ -130,48 +133,131 @@ button{font-family:inherit;color:inherit}
   .corner{display:none}
 }
 @media (max-width:520px){.brand{display:none}.search input{width:104px;padding-left:28px}.seg button{padding:6px 8px}}
+
+/* ===== accessibility & touch ===== */
+:root{--goldtext:#7a5c1c;--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px)}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+button,a,input{touch-action:manipulation}
+:focus{outline:none}
+:focus-visible{outline:3px solid #8a3f12;outline-offset:2px;border-radius:12px}
+#cv:focus-visible{outline:none}
+.facts .k{color:var(--goldtext)}
+.bar{top:calc(14px + var(--sat))}
+.zoom{right:calc(16px + var(--sar));bottom:calc(186px + var(--sab))}
+.mini{right:calc(16px + var(--sar));bottom:calc(16px + var(--sab))}
+.legend{left:calc(16px + var(--sal));bottom:calc(16px + var(--sab))}
+.tog[aria-checked=true] i{background:var(--olive)}
+.tog[aria-checked=true] i:after{left:calc(100% - 15px)}
+.seg button,.tog{min-height:40px}
+.results [role=option]{display:block;width:100%;text-align:left;border:0;background:transparent;padding:9px 12px;border-radius:9px;cursor:pointer;min-height:44px}
+.results [role=option][aria-selected=true],.results [role=option]:hover{background:rgba(201,199,158,.5)}
+.panel .close{width:44px;height:44px}
+.chip{min-height:40px}
+.zoom .help{font:700 20px var(--serif)}
+.sheet-handle{display:none}
+.lb .lbclose{position:absolute;top:calc(14px + var(--sat));right:calc(14px + var(--sar));width:48px;height:48px;border-radius:50%;border:2px solid var(--line);background:var(--cream);display:grid;place-items:center;cursor:pointer}
+.lb figure{position:relative}
+.dlg{position:fixed;inset:0;z-index:8;background:rgba(61,47,28,.5);display:none;place-items:center;padding:16px}
+.dlg.on{display:grid}
+.dlg .card{background:var(--cream);border:2px solid var(--line);border-radius:18px;max-width:520px;width:100%;max-height:88vh;overflow:auto;padding:22px 24px;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative}
+.dlg h2{font-family:var(--caps);font-weight:400;font-size:22px;letter-spacing:.05em;margin:0 50px 6px 0}
+.dlg h3{font-family:var(--caps);font-weight:400;font-size:15px;letter-spacing:.1em;color:var(--ink2);margin:16px 0 6px}
+.dlg ul{margin:0;padding-left:20px;font-size:16.5px;line-height:1.45}
+.dlg .lg{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center;font-size:16.5px}
+.dlg .lg b{width:22px;height:16px;border-radius:5px;border:1.5px solid var(--line);display:inline-block}
+.dlg .x{position:absolute;top:14px;right:14px;width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:var(--cream);display:grid;place-items:center;cursor:pointer}
+kbd{font-family:inherit;font-weight:700;border:1.5px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:0 6px;background:#fff;font-size:14px}
+@media (pointer:coarse){
+  .zoom button{width:48px;height:48px}
+  .seg button,.tog{min-height:44px}
+  .chip{min-height:44px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+
+/* ===== phones: bottom sheet & compact toolbar ===== */
+@media (max-width:640px){
+  .bar{left:calc(8px + var(--sal));right:calc(8px + var(--sar));transform:none;max-width:none;top:calc(8px + var(--sat));padding:5px 5px 5px 6px;gap:5px;border-radius:30px}
+  .seg{flex:none}
+  .seg button{padding:6px 10px;font-size:14.5px}
+  .search{flex:1;min-width:0}
+  .search input{width:100%;font-size:16px;padding:9px 10px 9px 30px}
+  .results{position:fixed;left:calc(8px + var(--sal));right:calc(8px + var(--sar));top:calc(70px + var(--sat));width:auto;max-height:60vh}
+  .tog{padding:4px 2px}
+  .zoom{bottom:calc(12px + var(--sab));right:calc(10px + var(--sar));flex-direction:row;gap:6px}
+  .zoom button{width:44px;height:44px}
+  .hint{top:calc(112px + var(--sat))}
+  .panel{top:auto;left:0;right:0;bottom:0;width:100%;height:min(72vh,72dvh);border-left:0;border-top:2px solid var(--line);border-radius:22px 22px 0 0;
+    transform:translateY(105%);box-shadow:0 -10px 30px rgba(61,47,28,.18);padding-bottom:var(--sab);overscroll-behavior:contain}
+  .panel.on{transform:translateY(var(--drag,0px))}
+  .panel.full{height:calc(100dvh - 10px - var(--sat))}
+  .panel .inner{padding:0 18px 40px}
+  .panel .phead{margin:0 -18px;padding:16px 10px 8px 4px;border-radius:22px 22px 0 0;touch-action:none}
+  .panel .phead .pc{width:64px}
+  .sheet-handle{display:block;position:absolute;top:6px;left:50%;width:44px;height:5px;margin-left:-22px;border-radius:3px;background:rgba(90,69,32,.45)}
+  .panel .pname{font-size:26px}
+  body.sheet-open .zoom{display:none}
+}
 </style>
 </head>
 <body>
-<canvas id="cv" aria-label="Family tree"></canvas>
+<h1 class="sr-only">The Family Tapestry: the Kotzé &amp; Pieterse and Tillett family trees</h1>
+<div id="live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 <img class="corner tl" src="orn/corner-gold.webp" alt="">
 <img class="corner tr" src="orn/corner-gold.webp" alt="">
 
-<div class="bar" role="toolbar">
+<header class="bar">
   <div class="brand"><img src="orn/flower.webp" alt=""><span>The Family Tapestry</span></div>
-  <div class="seg" id="treeSeg">
+  <div class="seg" id="treeSeg" role="group" aria-label="Choose family tree">
     <button data-tree="kotze" aria-pressed="true">Kotzé &amp; Pieterse</button>
     <button data-tree="tillett" aria-pressed="false">Tillett</button>
   </div>
-  <button class="tog" id="sibTog" aria-pressed="true" title="Show brothers and sisters in each family"><i></i><span>Siblings</span></button>
+  <button class="tog" id="sibTog" role="switch" aria-checked="true" aria-label="Show brothers and sisters" title="Show brothers and sisters in each family"><i aria-hidden="true"></i><span aria-hidden="true">Siblings</span></button>
   <div class="search">
     <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="#5a4520" stroke-width="1.8"/><path d="M11 11l4 4" stroke="#5a4520" stroke-width="1.8" stroke-linecap="round"/></svg>
-    <input id="q" type="search" placeholder="Find a person…" autocomplete="off" aria-label="Search people">
-    <div class="results" id="results"></div>
+    <input id="q" type="search" placeholder="Find a person…" autocomplete="off" aria-label="Find a person by name" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="results">
+    <div class="results" id="results" role="listbox" aria-label="Search results"></div>
   </div>
-</div>
-<div class="hint" id="hint">Generations rise upward from you · drag to wander · tap anyone to meet them</div>
+</header>
+<canvas id="cv" tabindex="0" role="application" aria-roledescription="family tree" aria-label="Family tree" aria-describedby="cvhelp"></canvas>
+<p id="cvhelp" class="sr-only">Use the arrow keys to move between people: up to their parents, down towards you, left and right along the same generation. Press Enter to read about the selected person. Hold Shift with the arrow keys to pan, plus and minus to zoom, H to return home, 0 to see the whole tree. Or use the search box to find someone by name.</p>
+<div class="hint" id="hint" aria-hidden="true">Generations rise upward from you · drag to wander · tap anyone to meet them</div>
 
-<div class="zoom">
+<div class="zoom" role="group" aria-label="Map controls">
   <button id="zin" title="Zoom in" aria-label="Zoom in">+</button>
   <button id="zout" title="Zoom out" aria-label="Zoom out">−</button>
   <button id="zhome" title="Back to Vivien &amp; Keith" aria-label="Back to the start">
-    <svg width="18" height="18" viewBox="0 0 18 18"><path d="M2 9l7-6 7 6M4 8v7h10V8" fill="none" stroke="#5a4520" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 9l7-6 7 6M4 8v7h10V8" fill="none" stroke="#5a4520" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+  <button id="zhelp" class="help" title="How to use" aria-label="How to use and what the colours mean" aria-haspopup="dialog">?</button>
   <button id="zfit" title="See the whole tree" aria-label="See the whole tree">
-    <svg width="16" height="16" viewBox="0 0 16 16"><path d="M1 5V1h4M11 1h4v4M15 11v4h-4M5 15H1v-4" fill="none" stroke="#5a4520" stroke-width="1.8"/></svg></button>
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 5V1h4M11 1h4v4M15 11v4h-4M5 15H1v-4" fill="none" stroke="#5a4520" stroke-width="1.8"/></svg></button>
 </div>
-<div class="legend">
+<div class="legend" aria-hidden="true">
   <span><b style="background:#c9c79e"></b>Fathers</span>
   <span><b style="background:#f2c48d"></b>Mothers</span>
   <span><b style="background:#fbf4e4"></b>Brothers &amp; sisters</span>
   <span><svg width="14" height="17" viewBox="0 0 14 17" aria-hidden="true"><path d="M1 1h8l4 4v11H1z" fill="#fffaf0" stroke="#8a4b22" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 1v4h4M3.5 8h7M3.5 11h7M3.5 14h4" fill="none" stroke="#8a4b22" stroke-width="1.1"/></svg><em>Mom's note</em></span>
   <span><svg width="15" height="15" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="#d4af5c" stroke="#5a4520" stroke-width="1.3"/><path d="M9 3.6l1.3 3.4 3.6.2-2.8 2.3.9 3.5L9 11l-3 2 .9-3.5L4.1 7.2l3.6-.2z" fill="#fbf4e4"/></svg>A story from history</span>
 </div>
-<div class="mini" id="mini" title="Tap to jump"><canvas id="mcv"></canvas></div>
+<div class="mini" id="mini" title="Tap to jump" aria-hidden="true"><canvas id="mcv"></canvas></div>
 
-<aside class="panel" id="panel" aria-live="polite"><div class="inner" id="pinner"></div></aside>
-<div class="lb" id="lb" role="dialog" aria-label="Source record"><figure><img alt="Source record"><figcaption>One of Mom's source records · tap anywhere to close</figcaption></figure></div>
-<div class="loading" id="loading"><div><img src="orn/lady.webp" alt="">Weaving the family tapestry…</div></div>
+<aside class="panel" id="panel" role="dialog" aria-modal="false" aria-labelledby="pname" hidden><div class="inner" id="pinner"></div></aside>
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Source record"><button class="lbclose" aria-label="Close record"><svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="#5a4520" stroke-width="2" stroke-linecap="round"/></svg></button><figure><img alt="A screenshot of one of Mom's FamilySearch source records"><figcaption>One of Mom's source records · tap outside or press Escape to close</figcaption></figure></div>
+<div class="dlg" id="help" role="dialog" aria-modal="true" aria-labelledby="helpt"><div class="card">
+  <button class="x" aria-label="Close help"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="#5a4520" stroke-width="2" stroke-linecap="round"/></svg></button>
+  <h2 id="helpt">How to explore</h2>
+  <h3>On a phone or tablet</h3>
+  <ul><li><b>Drag</b> with one finger to wander; flick to glide.</li><li><b>Pinch</b> to zoom in and out.</li><li><b>Double-tap</b> to zoom in; <b>tap with two fingers</b> to zoom out.</li><li><b>Tap</b> anyone to meet them. Swipe the details card down to close it, or up to read more.</li></ul>
+  <h3>With a keyboard</h3>
+  <ul><li><kbd>Tab</kbd> to the tree, then <kbd>↑</kbd> parents, <kbd>↓</kbd> towards you, <kbd>←</kbd> <kbd>→</kbd> along a generation.</li><li><kbd>Enter</kbd> opens their details, <kbd>Esc</kbd> closes.</li><li><kbd>Shift</kbd> + arrows to pan, <kbd>+</kbd> <kbd>−</kbd> to zoom, <kbd>H</kbd> home, <kbd>0</kbd> whole tree.</li></ul>
+  <h3>What the colours mean</h3>
+  <div class="lg"><b style="background:#c9c79e"></b>Fathers in the line<b style="background:#f2c48d"></b>Mothers in the line<b style="background:#fbf4e4"></b>Brothers, sisters and others
+  <svg width="20" height="22" viewBox="0 0 14 17" aria-hidden="true"><path d="M1 1h8l4 4v11H1z" fill="#fffaf0" stroke="#8a4b22" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 1v4h4M3.5 8h7M3.5 11h7M3.5 14h4" fill="none" stroke="#8a4b22" stroke-width="1.1"/></svg>Mom left a note
+  <svg width="20" height="20" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="#d4af5c" stroke="#5a4520" stroke-width="1.3"/><path d="M9 3.6l1.3 3.4 3.6.2-2.8 2.3.9 3.5L9 11l-3 2 .9-3.5L4.1 7.2l3.6-.2z" fill="#fbf4e4"/></svg>A story from history
+  <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="10" fill="#fbf4e4" stroke="#5a4520" stroke-width="1.5"/><circle cx="8.5" cy="11" r="4.5" fill="none" stroke="#b8913f" stroke-width="1.6"/><circle cx="13.5" cy="11" r="4.5" fill="none" stroke="#b9672f" stroke-width="1.6"/></svg>Married (a heart means partners)</div>
+</div></div>
+<div class="loading" id="loading" role="status"><div><img src="orn/lady.webp" alt="">Weaving the family tapestry…</div></div>
 
 <script>
 (()=>{
@@ -184,6 +270,11 @@ let DPR=Math.min(devicePixelRatio||1,2),VW=0,VH=0;
 const view={x:0,y:0,s:1};
 let dirty=true,anim=null,selected=null,hover=null,showSibs=true,tree='kotze';
 let T=null,L=null; // data, layout
+const RM=matchMedia('(prefers-reduced-motion: reduce)');
+const isSheet=()=>VW<=640;
+let kbd=null; // keyboard-focused person node
+const live=document.getElementById('live');
+function say(t){live.textContent='';setTimeout(()=>live.textContent=t,30)}
 
 /* ================= ornaments ================= */
 const ORN={};['lady','corner-gold','divider','corner-calla','corner-lily','frame-vine','leaf','vine-bloom','vine-bloom2','garland','flower'].forEach(n=>{const im=new Image();im.onload=()=>dirty=true;im.src='orn/'+n+'.webp';ORN[n]=im});
@@ -333,7 +424,7 @@ function marrText(m){
 }
 
 /* ================= view ================= */
-function resize(){VW=innerWidth;VH=innerHeight;cv.width=VW*DPR;cv.height=VH*DPR;dirty=true;buildMini()}
+function resize(){VW=innerWidth;VH=innerHeight;const qi=document.getElementById('q');if(qi)qi.placeholder=VW<=900?'Search names':'Find a person…';requestAnimationFrame(()=>{const bb=document.querySelector('.bar').getBoundingClientRect().bottom;document.getElementById('hint').style.top=(bb+(VW<900?50:8))+'px'});cv.width=VW*DPR;cv.height=VH*DPR;dirty=true;buildMini()}
 function fitAll(animate=true){
   const top=90,bot=30;const s=Math.min((VW-60)/L.width,(VH-top-bot)/L.height);
   go({s,x:L.width/2-VW/2/s,y:L.height/2-(top+(VH-top-bot)/2)/s},animate);
@@ -341,8 +432,9 @@ function fitAll(animate=true){
 function home(animate=true){
   const f=L.rootFam;
   // show root family + 2 generations
-  const s=Math.max(.3,Math.min(1,VH/(RH*3.2),VW/760));
-  const cx=f.mx,cy=f.kids[0].y-RH*0.9;
+  const narrow=VW<=900;
+  const s=Math.max(.3,Math.min(1,VH/(RH*(narrow?2.4:3.2)),VW/(narrow?700:760)));
+  const cx=f.mx,cy=narrow?f.kids[0].y-RH*0.45:f.kids[0].y-RH*0.9;
   go(clampV({s,x:cx-VW/2/s,y:cy-VH/2/s}),animate);
 }
 const minS=()=>Math.min((VW-40)/L.width,(VH-120)/L.height)*0.9;
@@ -358,6 +450,7 @@ function clampV(v){
 }
 function go(t,animate=true){
   t=clampV({...t});
+  if(RM.matches)animate=false;
   if(!animate){Object.assign(view,t);dirty=true;return}
   const f={...view},t0=performance.now(),D=700;
   anim=now=>{let k=Math.min(1,(now-t0)/D);k=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
@@ -371,7 +464,9 @@ function zoomAt(sx,sy,factor){
   const v=clampV({s:ns,x:wx-sx/ns,y:wy-sy/ns});Object.assign(view,v);dirty=true;
 }
 function flyTo(n,openPanel){
-  const s=Math.max(view.s,0.75),pw=(VW>900&&openPanel)?410:0;
+  const s=Math.max(view.s,isSheet()?0.62:0.75);
+  if(openPanel&&isSheet()){const visH=VH*0.28;go({s,x:n.x+W/2-VW/2/s,y:n.y+H/2-(visH/2+40)/s});return}
+  const pw=(VW>640&&openPanel)?Math.min(410,VW):0;
   go({s,x:n.x+W/2-(VW-pw)/2/s,y:n.y+H/2-VH/2/s});
 }
 
@@ -490,6 +585,7 @@ function card(n,s){
   cardPath(x,y,W,H);ctx.fillStyle=fill(n);ctx.fill();
   ctx.lineWidth=Math.max(sel?4.5:2.6,(sel?2.2:1.1)/s);ctx.strokeStyle=sel?COL.gold2:hov?COL.terra:COL.line;ctx.stroke();
   if(onPath&&!sel){ctx.lineWidth=Math.max(3,1.2/s);ctx.strokeStyle=COL.gold;cardPath(x-5,y-5,W+10,H+10);ctx.stroke()}
+  if(kbd===n&&document.activeElement===cv){ctx.save();ctx.setLineDash([10,7]);ctx.lineWidth=Math.max(4,2.4/s);ctx.strokeStyle='#8a3f12';cardPath(x-9,y-9,W+18,H+18);ctx.stroke();ctx.restore()}
   if(n.role==='R'){ctx.lineWidth=Math.max(1.4,.6/s);ctx.strokeStyle=COL.gold2;cardPath(x+6,y+6,W-12,H-12);ctx.stroke()}
   // text — always inside the card, sized for the zoom level
   ctx.save();cardPath(x+3,y+3,W-6,H-6);ctx.clip();
@@ -498,7 +594,7 @@ function card(n,s){
   if(s>=0.5){
     ctx.font='700 17px "Cormorant Garamond",Georgia,serif';
     const nl=wrap(p.name,W-pad*2,2);let yy=top+14;nl.forEach(l=>{ctx.fillText(l,x+pad,yy);yy+=17});
-    ctx.font='italic 600 15px "Cormorant Garamond",Georgia,serif';ctx.fillStyle=COL.ink2;
+    ctx.font='italic 600 15px "Cormorant Garamond",Georgia,serif';ctx.fillStyle='#46371f';
     if(p.span){ctx.fillText(p.span,x+pad,yy+3);yy+=17}
     if(p.place&&yy<y+H-10){ctx.font='500 13px "Cormorant Garamond",Georgia,serif';wrap(p.place,W-pad*2,1).forEach(l=>ctx.fillText(l,x+pad,yy+3))}
   }else if(sw>=34){
@@ -565,7 +661,15 @@ function decorations(vis,s){
 function drawGenLabels(s){
   ctx.setTransform(DPR,0,0,DPR,0,0);
   const rowPx=RH*s;if(rowPx<26)return;
-  const railW=VW<900?0:168;if(!railW)return;
+  const railW=VW<900?0:168;
+  if(!railW){ // compact chip: which generation is in the middle of the screen
+    const cy=view.y+VH*0.45/s;let best=null,bd=1e9;for(const g of L.gens){const d=Math.abs(g.y+H/2-cy);if(d<bd){bd=d;best=g}}
+    if(!best)return;const g=best;
+    const label=g.lv<0?'Next generation':g.lv===0?'You':g.lv===1?'Parents':g.lv===2?'Grandparents':g.lv===3?'Great-grandparents':(g.lv-2)+'× great-grandparents';
+    const txt=label+(g.yr?' · c. '+g.yr:'');ctx.font='600 15px "Cormorant Garamond",Georgia,serif';
+    const w=ctx.measureText(txt).width+24,x=10,y=document.querySelector('.bar').getBoundingClientRect().bottom+8;
+    ctx.fillStyle='rgba(251,244,228,.95)';rr(x,y,w,30,15);ctx.fill();ctx.strokeStyle='rgba(90,69,32,.55)';ctx.lineWidth=1.2;ctx.stroke();
+    ctx.fillStyle=COL.ink;ctx.fillText(txt,x+12,y+20);return}
   const gr=ctx.createLinearGradient(0,0,railW,0);gr.addColorStop(0,'rgba(243,234,215,.97)');gr.addColorStop(.7,'rgba(243,234,215,.85)');gr.addColorStop(1,'rgba(243,234,215,0)');
   ctx.fillStyle=gr;ctx.fillRect(0,0,railW,VH);
   const step=rowPx<44?3:rowPx<70?2:1;
@@ -575,7 +679,7 @@ function drawGenLabels(s){
     const label=g.lv<0?'Next generation':g.lv===0?'You':g.lv===1?'Parents':g.lv===2?'Grandparents':g.lv===3?'Great-grandparents':(g.lv-2)+'× great-grandparents';
     ctx.strokeStyle='rgba(90,69,32,.35)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(14,sy+18);ctx.lineTo(railW-40,sy+18);ctx.stroke();
     ctx.fillStyle=COL.ink2;ctx.font='400 13px "Marcellus SC",serif';ctx.fillText(label,16,sy-2);
-    if(g.yr){ctx.font='italic 600 15px "Cormorant Garamond",serif';ctx.fillStyle=COL.gold2;ctx.fillText('c. '+g.yr,16,sy+14)}
+    if(g.yr){ctx.font='italic 600 15px "Cormorant Garamond",serif';ctx.fillStyle='#7a5c1c';ctx.fillText('c. '+g.yr,16,sy+14)}
   }
 }
 function rrS(x,y,w,h,r){rr(x,y,w,h,r)}
@@ -605,39 +709,98 @@ document.getElementById('mini').addEventListener('click',e=>{const r=mcv.getBoun
 function hit(sx,sy){
   const wx=view.x+sx/view.s,wy=view.y+sy/view.s;const list=L.grid.get(Math.floor(wx/L.G)+','+Math.floor(wy/L.G))||[];
   const sl=6/view.s;for(const n of list)if(wx>=n.x-sl&&wx<=n.x+W+sl&&wy>=n.y-sl&&wy<=n.y+H+sl)return n;return null}
-const ptrs=new Map();let drag=null,moved=false,pinch=null;
-cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});anim=null;hideHint();
-  if(ptrs.size===1){drag={x:e.clientX,y:e.clientY,vx:view.x,vy:view.y};moved=false}
-  if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),s:view.s,wx:view.x+((a.x+b.x)/2)/view.s,wy:view.y+((a.y+b.y)/2)/view.s}}});
+const ptrs=new Map();let drag=null,moved=false,pinch=null,vel={x:0,y:0,t:0},lastTap=null,two=null;
+function startInertia(vx,vy){ // px per ms in screen space
+  if(RM.matches)return;let last=performance.now();
+  anim=now=>{const dt=Math.min(40,now-last);last=now;const k=Math.pow(0.94,dt/16);vx*=k;vy*=k;
+    Object.assign(view,clampV({s:view.s,x:view.x-vx*dt/view.s,y:view.y-vy*dt/view.s}));dirty=true;
+    if(Math.hypot(vx,vy)<0.02)anim=null};
+}
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY,t:performance.now()});anim=null;hideHint();
+  if(ptrs.size===1){drag={x:e.clientX,y:e.clientY,vx:view.x,vy:view.y};moved=false;vel={x:0,y:0,t:performance.now(),px:e.clientX,py:e.clientY}}
+  if(ptrs.size===2){const [a,b]=[...ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);
+    pinch={d,s:view.s,wx:view.x+((a.x+b.x)/2)/view.s,wy:view.y+((a.y+b.y)/2)/view.s};two={t:performance.now(),d,moved:false,mx:(a.x+b.x)/2,my:(a.y+b.y)/2}}});
 cv.addEventListener('pointermove',e=>{
-  if(!ptrs.has(e.pointerId)){const n=hit(e.clientX,e.clientY);if(n!==hover){hover=n;cv.style.cursor=n?'pointer':'grab';dirty=true}return}
-  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(ptrs.size===2&&pinch){const [a,b]=[...ptrs.values()];const ns=pinch.s*Math.hypot(a.x-b.x,a.y-b.y)/pinch.d;const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
-    const s2=Math.max(minS(),Math.min(2.2,ns));Object.assign(view,clampV({s:s2,x:pinch.wx-mx/s2,y:pinch.wy-my/s2}));moved=true;dirty=true;return}
-  if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>4){moved=true;cv.classList.add('drag')}
-    Object.assign(view,clampV({s:view.s,x:drag.vx-dx/view.s,y:drag.vy-dy/view.s}));dirty=true}});
-function endPtr(e){ptrs.delete(e.pointerId);cv.classList.remove('drag');if(ptrs.size<2)pinch=null;
-  if(ptrs.size===0){if(!moved&&drag&&e.type==='pointerup'){const n=hit(e.clientX,e.clientY);if(n)select(n,false);else closePanel()}drag=null}
-  else if(ptrs.size===1){const [a]=[...ptrs.values()];drag={x:a.x,y:a.y,vx:view.x,vy:view.y}}}
+  if(!ptrs.has(e.pointerId)){if(e.pointerType==='mouse'){const n=hit(e.clientX,e.clientY);if(n!==hover){hover=n;cv.style.cursor=n?'pointer':'grab';dirty=true}}return}
+  ptrs.set(e.pointerId,{...ptrs.get(e.pointerId),x:e.clientX,y:e.clientY});
+  if(ptrs.size===2&&pinch){const [a,b]=[...ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+    if(two&&(Math.abs(d-two.d)>12||Math.hypot(mx-two.mx,my-two.my)>12))two.moved=true;
+    const s2=Math.max(minS(),Math.min(2.2,pinch.s*d/pinch.d));Object.assign(view,clampV({s:s2,x:pinch.wx-mx/s2,y:pinch.wy-my/s2}));moved=true;dirty=true;return}
+  if(drag){const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>(e.pointerType==='mouse'?4:9)){moved=true;cv.classList.add('drag')}
+    if(moved){Object.assign(view,clampV({s:view.s,x:drag.vx-dx/view.s,y:drag.vy-dy/view.s}));dirty=true}
+    const now=performance.now(),dt=now-vel.t;if(dt>0){const ix=(e.clientX-vel.px)/dt,iy=(e.clientY-vel.py)/dt;vel={x:vel.x*0.6+ix*0.4,y:vel.y*0.6+iy*0.4,t:now,px:e.clientX,py:e.clientY}}}});
+function endPtr(e){const was=ptrs.get(e.pointerId);ptrs.delete(e.pointerId);cv.classList.remove('drag');
+  if(ptrs.size===0&&two){ // two-finger tap => zoom out
+    if(!two.moved&&performance.now()-two.t<350&&e.type==='pointerup'){zoomAround(two.mx,two.my,1/2)}two=null;pinch=null;drag=null;return}
+  if(ptrs.size<2)pinch=null;
+  if(ptrs.size===0){
+    if(e.type==='pointerup'&&drag){
+      if(!moved){
+        const now=performance.now();
+        if(e.pointerType!=='mouse'&&lastTap&&now-lastTap.t<320&&Math.hypot(e.clientX-lastTap.x,e.clientY-lastTap.y)<34){zoomAround(e.clientX,e.clientY,2);lastTap=null}
+        else{lastTap={t:now,x:e.clientX,y:e.clientY};const n=hit(e.clientX,e.clientY);if(n){kbd=n;select(n,false)}else closePanel()}
+      }else if(performance.now()-vel.t<60&&Math.hypot(vel.x,vel.y)>0.25)startInertia(vel.x,vel.y);
+    }
+    drag=null}
+  else if(ptrs.size===1){const [a]=[...ptrs.values()];drag={x:a.x,y:a.y,vx:view.x,vy:view.y};moved=true}}
+function zoomAround(sx,sy,f){const ns=Math.max(minS(),Math.min(2.2,view.s*f));const wx=view.x+sx/view.s,wy=view.y+sy/view.s;go({s:ns,x:wx-sx/ns,y:wy-sy/ns})}
 cv.addEventListener('pointerup',endPtr);cv.addEventListener('pointercancel',endPtr);
 cv.addEventListener('wheel',e=>{e.preventDefault();anim=null;hideHint();
   const mouseWheel=e.deltaMode!==0||(e.deltaX===0&&Math.abs(e.deltaY)>=40&&Number.isInteger(e.deltaY));
   if(e.ctrlKey||mouseWheel)zoomAt(e.clientX,e.clientY,Math.exp(-e.deltaY*(e.ctrlKey?0.01:0.0018)*(e.deltaMode===1?30:1)));
   else{Object.assign(view,clampV({s:view.s,x:view.x+e.deltaX/view.s,y:view.y+e.deltaY/view.s}));dirty=true}},{passive:false});
-cv.addEventListener('dblclick',e=>{const ns=Math.min(2.2,view.s*2);const wx=view.x+e.clientX/view.s,wy=view.y+e.clientY/view.s;go({s:ns,x:wx-e.clientX/ns,y:wy-e.clientY/ns})});
+cv.addEventListener('dblclick',e=>{zoomAround(e.clientX,e.clientY,2)});
 const zc=f=>{const t=Math.max(minS(),Math.min(2.2,view.s*f));const cx=view.x+VW/2/view.s,cy=view.y+VH/2/view.s;go({s:t,x:cx-VW/2/t,y:cy-VH/2/t})};
 document.getElementById('zin').onclick=()=>zc(1.8);document.getElementById('zout').onclick=()=>zc(1/1.8);
 document.getElementById('zfit').onclick=()=>fitAll();document.getElementById('zhome').onclick=()=>{closePanel();home()};
-addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;const st=140/view.s;let v={...view};
-  if(e.key==='ArrowLeft')v.x-=st;else if(e.key==='ArrowRight')v.x+=st;else if(e.key==='ArrowUp')v.y-=st;else if(e.key==='ArrowDown')v.y+=st;
-  else if(e.key==='+'||e.key==='=')return zoomAt(VW/2,VH/2,1.3);else if(e.key==='-')return zoomAt(VW/2,VH/2,1/1.3);
-  else if(e.key==='Escape'){lb.classList.remove('on');return closePanel()}else return;Object.assign(view,clampV(v));dirty=true});
+function roleWord(n){return n.role==='F'?'father in the line':n.role==='M'?'mother in the line':n.role==='R'?'':n.role==='P'?'married or partnered in':n.role==='D'?'next generation':'brother or sister'}
+function genWord(lv){return lv<0?'next generation':lv===0?'your generation':lv===1?'parents':lv===2?'grandparents':lv===3?'great-grandparents':(lv-2)+' times great-grandparents'}
+function focusPerson(n,announce=true){kbd=n;dirty=true;
+  const sx=(n.x+W/2-view.x)*view.s,sy=(n.y+H/2-view.y)*view.s,pad=80;
+  if(sx<pad||sx>VW-pad-(panel.classList.contains('on')&&!isSheet()?410:0)||sy<120||sy>VH-(panel.classList.contains('on')&&isSheet()?VH*0.72:pad))flyTo(n,panel.classList.contains('on'));
+  if(announce){const p=T.P[n.pid];say(`${p.name}${p.span?', '+p.span:''}. ${roleWord(n)}${roleWord(n)?', ':''}${genWord(n.lv)}.${T.stories[n.pid]?' Has a story from history.':''}${T.persons[n.pid].n?' Mom left a note.':''} Press Enter for details.`)}}
+function neighbour(n,dir){
+  if(dir==='up'){const f=L.famOfKid.get(n);if(f)return f.parents[0];return null}
+  if(dir==='down'){const nx=L.parentNode.get(n);if(nx)return nx;const f=L.famAsParent.get(n);return f?f.kids[0]:null}
+  const row=L.rows.get(n.lv)||[];const i=row.indexOf(n);return row[i+(dir==='left'?-1:1)]||null;
+}
+function anyDialogOpen(){return lb.classList.contains('on')||helpDlg.classList.contains('on')}
+addEventListener('keydown',e=>{
+  if(e.key==='Escape'){if(lb.classList.contains('on'))return closeLB();if(helpDlg.classList.contains('on'))return closeHelp();if(panel.classList.contains('on')){closePanel(true);return}return}
+  if(anyDialogOpen())return;
+  const t=e.target;if(t.tagName==='INPUT'||(t!==cv&&t!==document.body))return;
+  const dirs={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};
+  if(dirs[e.key]&&!e.shiftKey&&t===cv){e.preventDefault();
+    if(!kbd){focusPerson(L.rootFam.kids[0]);return}
+    const nb=neighbour(kbd,dirs[e.key]);if(nb)focusPerson(nb);else say(dirs[e.key]==='up'?'No parents recorded for '+T.P[kbd.pid].name+'.':'No one further that way.');return}
+  if((e.key==='Enter'||e.key===' ')&&t===cv){e.preventDefault();if(!kbd)kbd=L.rootFam.kids[0];select(kbd,true);return}
+  const st=140/view.s;let v={...view};
+  if(dirs[e.key]&&e.shiftKey){e.preventDefault();if(e.key==='ArrowLeft')v.x-=st;else if(e.key==='ArrowRight')v.x+=st;else if(e.key==='ArrowUp')v.y-=st;else v.y+=st;Object.assign(view,clampV(v));dirty=true;return}
+  if(e.key==='+'||e.key==='=')return zoomAt(VW/2,VH/2,1.3);
+  if(e.key==='-'||e.key==='_')return zoomAt(VW/2,VH/2,1/1.3);
+  if(e.key==='0')return fitAll();
+  if(e.key==='h'||e.key==='H'){closePanel();return home()}
+});
+cv.addEventListener('focus',()=>{if(!kbd&&L){kbd=null;say('Family tree. Use arrow keys to move between people, Enter for details.')}dirty=true});
+cv.addEventListener('blur',()=>{dirty=true});
 addEventListener('resize',resize);
 setTimeout(hideHint,8000);function hideHint(){document.getElementById('hint').style.opacity=0}
 
 /* ================= panel ================= */
 const panel=document.getElementById('panel'),pinner=document.getElementById('pinner'),lb=document.getElementById('lb');
-lb.addEventListener('click',()=>lb.classList.remove('on'));
+let lbReturn=null;
+function trap(dlg,e){if(e.key!=='Tab')return;const f=[...dlg.querySelectorAll('button,a[href],input')].filter(x=>!x.disabled&&x.offsetParent!==null);if(!f.length)return;
+  const a=f[0],z=f[f.length-1];if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}}
+function openLB(src,from){lbReturn=from||document.activeElement;lb.querySelector('img').src=src;lb.classList.add('on');lb.querySelector('.lbclose').focus()}
+function closeLB(){lb.classList.remove('on');if(lbReturn&&document.contains(lbReturn))lbReturn.focus()}
+lb.addEventListener('click',e=>{if(!e.target.closest('figure')||e.target.closest('.lbclose'))closeLB()});
+lb.addEventListener('keydown',e=>trap(lb,e));
+const helpDlg=document.getElementById('help');let helpReturn=null;
+function openHelp(){helpReturn=document.activeElement;helpDlg.classList.add('on');helpDlg.querySelector('.x').focus()}
+function closeHelp(){helpDlg.classList.remove('on');if(helpReturn&&document.contains(helpReturn))helpReturn.focus()}
+helpDlg.addEventListener('click',e=>{if(!e.target.closest('.card')||e.target.closest('.x'))closeHelp()});
+helpDlg.addEventListener('keydown',e=>trap(helpDlg,e));
+document.getElementById('zhelp').onclick=openHelp;
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function relatives(pid){
   const U=T.units,P=T.persons;const par=T.pu[pid]!=null?U[T.pu[pid]]:null;
@@ -658,9 +821,9 @@ function select(n,fly){
   const lineFor=n.role==='A'||n.role==='F'||n.role==='M';
   const recs=[];if(r.parUnit)recs.push(...r.parUnit.r);r.myUnits.forEach(u=>recs.push(...u.r));
   const urecs=[...new Map(recs.map(x=>[x.join(':'),x])).values()].slice(0,9);
-  pinner.innerHTML=`<div class="phead"><img class="pc" src="orn/corner-calla.webp" alt=""><span class="badge" style="background:${role[1]}">${role[0]}</span>
-    <button class="close" aria-label="Close"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 2l10 10M12 2L2 12" stroke="#5a4520" stroke-width="2" stroke-linecap="round"/></svg></button></div>
-    <h1>${esc(p.name)}</h1>${p.span?`<div class="span">${esc(p.span)}</div>`:''}
+  pinner.innerHTML=`<div class="phead"><span class="sheet-handle" aria-hidden="true"></span><img class="pc" src="orn/corner-calla.webp" alt=""><span class="badge" style="background:${role[1]}">${role[0]}</span>
+    <button class="close" aria-label="Close details"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="#5a4520" stroke-width="2" stroke-linecap="round"/></svg></button></div>
+    <h2 id="pname" class="pname" tabindex="-1">${esc(p.name)}</h2>${p.span?`<div class="span">${esc(p.span)}</div>`:''}
     <ul class="facts">${p.facts.map(f=>`<li><span class="k">${f.k}</span><span>${esc(f.v)}</span></li>`).join('')}
     ${r.myUnits.map(u=>marrText(u.m)).filter(Boolean).slice(0,1).map(m=>`<li><span class="k">Married</span><span>${esc(m)}</span></li>`).join('')}
     ${raw.ids.length?`<li><span class="k">Record</span><span>${raw.ids.map(esc).join(', ')}</span></li>`:''}</ul>
@@ -674,49 +837,79 @@ function select(n,fly){
     ${urecs.length?`<h3>Mom's source records</h3><div class="recs" id="recs"><div class="ld">Unrolling records…</div></div>`:''}
     ${raw.ids.length?`<h3>FamilySearch</h3><div class="links">${raw.ids.map(i=>`<a href="https://www.familysearch.org/tree/person/details/${encodeURIComponent(i)}" target="_blank" rel="noopener">Open ${esc(i)} <small>on familysearch.org ↗</small></a>`).join('')}</div>`:''}
     <img src="orn/corner-lily.webp" alt="" style="width:96px;display:block;margin:28px 0 0 auto;transform:scale(-1,-1);opacity:.9">`;
-  pinner.querySelector('.close').onclick=closePanel;
+  pinner.querySelector('.close').onclick=()=>closePanel(true);
   pinner.querySelectorAll('.chip[data-pid]').forEach(b=>b.onclick=()=>{const m=L.byPid.get(+b.dataset.pid);if(m){select(m,true)}});
   if(urecs.length)loadRecs(urecs);
-  panel.classList.add('on');panel.scrollTop=0;
-  if(fly)flyTo(n,true);
+  const wasOpen=panel.classList.contains('on');
+  if(!wasOpen)lastFocus=document.activeElement;
+  panel.hidden=false;panel.classList.remove('full');panel.style.removeProperty('--drag');
+  requestAnimationFrame(()=>{panel.classList.add('on');document.body.classList.add('sheet-open')});
+  panel.scrollTop=0;
+  if(fly)flyTo(n,true);else if(isSheet()){const sy=(n.y+H/2-view.y)*view.s;if(sy>VH*0.3)flyTo(n,true)}
+  setTimeout(()=>{const h2=document.getElementById('pname');if(h2)h2.focus({preventScroll:true})},60);
+  say(`Details for ${p.name} opened.`);
 }
+let lastFocus=null;
 function storyHTML(st){
   const head=st.kind==='settler'?'Arriving at the Cape':st.kind==='legend'?'A story from legend':'A story from history';
   return `<div class="story ${st.kind}"><div class="sh"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="#d4af5c" stroke="#5a4520" stroke-width="1.3"/><path d="M9 3.6l1.3 3.4 3.6.2-2.8 2.3.9 3.5L9 11l-3 2 .9-3.5L4.1 7.2l3.6-.2z" fill="#fbf4e4"/></svg>${head}</div>
     <p>${esc(st.text)}</p>${st.note?`<p class="sn">${esc(st.note)}</p>`:''}
     <div class="sl">${st.links.map(([l,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(l)} ↗</a>`).join('')}</div></div>`;
 }
-function closePanel(){panel.classList.remove('on');selected=null;pathSet.clear();dirty=true}
+function closePanel(restore){if(!panel.classList.contains('on')){selected=null;pathSet.clear();dirty=true;return}
+  panel.classList.remove('on','full');panel.style.removeProperty('--drag');document.body.classList.remove('sheet-open');selected=null;pathSet.clear();dirty=true;
+  setTimeout(()=>{if(!panel.classList.contains('on'))panel.hidden=true},380);
+  if(restore){const f=(lastFocus&&document.contains(lastFocus)&&lastFocus!==document.body)?lastFocus:cv;f.focus({preventScroll:true})}}
+// swipe gestures on the details card: sheet (phones) drag down to close / up to expand; side panel swipe right to close
+(()=>{let st=null;
+  panel.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;const onHead=!!e.target.closest('.phead');
+    if(isSheet()&&!onHead&&panel.scrollTop>0)return;st={x:e.clientX,y:e.clientY,onHead,id:e.pointerId,act:false}});
+  panel.addEventListener('pointermove',e=>{if(!st||e.pointerId!==st.id)return;const dx=e.clientX-st.x,dy=e.clientY-st.y;
+    if(isSheet()){if(!st.act&&Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)&&(st.onHead||dy>0)){st.act=true;panel.style.transition='none'}
+      if(st.act&&dy>0)panel.style.setProperty('--drag',dy+'px')}
+    else{if(!st.act&&dx>14&&Math.abs(dx)>Math.abs(dy)*1.5){st.act=true;panel.style.transition='none'}if(st.act)panel.style.transform=`translateX(${Math.max(0,dx)}px)`}});
+  const end=e=>{if(!st||e.pointerId!==st.id)return;const dx=e.clientX-st.x,dy=e.clientY-st.y;panel.style.transition='';panel.style.transform='';
+    if(st.act){if(isSheet()){if(dy>90)closePanel(true);else if(dy<-50)panel.classList.add('full');panel.style.removeProperty('--drag')}else if(dx>80)closePanel(true)}
+    else if(isSheet()&&st.onHead&&dy<-40)panel.classList.add('full');st=null};
+  panel.addEventListener('pointerup',end);panel.addEventListener('pointercancel',end);
+  panel.addEventListener('touchmove',e=>{if(st&&st.act)e.preventDefault()},{passive:false});
+})();
 const recBundles={};
 async function bundle(pg){if(!recBundles[pg])recBundles[pg]=fetch('data/'+pg+'-records.json').then(r=>r.json()).catch(()=>({}));return recBundles[pg]}
 async function loadRecs(list){
   const el=document.getElementById('recs');const imgs=[];
   for(const [pg,img] of list){const b=await bundle(pg);if(b[img])imgs.push(b[img])}
   if(document.getElementById('recs')!==el)return;
-  el.innerHTML=imgs.length?imgs.map((src,i)=>`<button data-i="${i}" aria-label="Open record"><img src="${src}" alt="Source record"></button>`).join(''):'<div class="ld">No records pinned here.</div>';
-  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{lb.querySelector('img').src=imgs[+b.dataset.i];lb.classList.add('on')});
+  el.innerHTML=imgs.length?imgs.map((src,i)=>`<button data-i="${i}" aria-label="Open source record ${i+1} of ${imgs.length}"><img src="${src}" alt=""></button>`).join(''):'<div class="ld">No records pinned here.</div>';
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>openLB(imgs[+b.dataset.i],b));
 }
 
 /* ================= search ================= */
 const q=document.getElementById('q'),res=document.getElementById('results');let hits=[],hl=0;
-q.addEventListener('input',()=>{const v=norm(q.value);if(v.length<2){res.classList.remove('on');return}
+q.addEventListener('input',()=>{const v=norm(q.value);if(v.length<2){hideRes();return}
   const parts=v.split(' ');hits=[];
   for(const [tk,lay] of Object.entries(LAYOUTS)){lay.byPid.forEach((n,pid)=>{const p=T.P[pid];if(parts.every(w=>p.n.includes(w)||T.persons[pid].ids.some(i=>i.toLowerCase().includes(w))))hits.push({tk,n,pid})})}
   // prefer current tree, dedupe pid
   const seen=new Set();hits=hits.sort((a,b)=>(b.tk===tree)-(a.tk===tree)||T.P[a.pid].n.length-T.P[b.pid].n.length).filter(h=>!seen.has(h.pid)&&seen.add(h.pid)).slice(0,40);hl=0;renderRes()});
 q.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){hl=Math.min(hl+1,hits.length-1);renderRes();e.preventDefault()}else if(e.key==='ArrowUp'){hl=Math.max(hl-1,0);renderRes();e.preventDefault()}
-  else if(e.key==='Enter'&&hits[hl])pick(hits[hl]);else if(e.key==='Escape'){res.classList.remove('on');q.blur()}});
-q.addEventListener('focus',()=>{if(q.value.length>1)res.classList.add('on')});
-document.addEventListener('pointerdown',e=>{if(!e.target.closest('.search'))res.classList.remove('on')});
-function renderRes(){res.classList.add('on');if(!hits.length){res.innerHTML='<div class="empty">No one by that name yet…</div>';return}
-  res.innerHTML=hits.map((h,i)=>{const p=T.P[h.pid];return `<button class="${i===hl?'hl':''}" data-i="${i}"><div class="n">${esc(p.name)}</div><div class="m">${esc(p.span||'dates unknown')} · ${h.tk==='kotze'?'Kotzé & Pieterse':'Tillett'}${h.n.role==='C'?' · sibling':''}</div></button>`}).join('');
-  res.querySelectorAll('button').forEach(b=>b.onclick=()=>pick(hits[+b.dataset.i]))}
-function pick(h){res.classList.remove('on');q.blur();if(h.tk!==tree)setTree(h.tk,false);const n=L.byPid.get(h.pid);if(n)select(n,true)}
+  else if(e.key==='Enter'&&hits[hl]){e.preventDefault();pick(hits[hl])}else if(e.key==='Escape'){e.stopPropagation();hideRes()}});
+q.addEventListener('focus',()=>{if(q.value.length>1&&hits.length)showRes()});
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('.search'))hideRes()});
+function showRes(){res.classList.add('on');q.setAttribute('aria-expanded','true')}
+function hideRes(){res.classList.remove('on');q.setAttribute('aria-expanded','false');q.removeAttribute('aria-activedescendant')}
+let lastCount=-1;
+function renderRes(){showRes();
+  if(!hits.length){res.innerHTML='<div class="empty" role="option" aria-disabled="true" aria-selected="false">No one by that name yet…</div>';q.removeAttribute('aria-activedescendant');if(lastCount!==0)say('No one found');lastCount=0;return}
+  res.innerHTML=hits.map((h,i)=>{const p=T.P[h.pid];return `<div role="option" id="opt${i}" aria-selected="${i===hl}" data-i="${i}"><div class="n">${esc(p.name)}</div><div class="m">${esc(p.span||'dates unknown')} · ${h.tk==='kotze'?'Kotzé & Pieterse':'Tillett'}${h.n.role==='C'?' · sibling':''}</div></div>`}).join('');
+  q.setAttribute('aria-activedescendant','opt'+hl);const o=document.getElementById('opt'+hl);if(o)o.scrollIntoView({block:'nearest'});
+  if(lastCount!==hits.length){say(hits.length+(hits.length===1?' person':' people')+' found. Use up and down arrows to choose.');lastCount=hits.length}
+  res.querySelectorAll('[role=option][data-i]').forEach(b=>b.onclick=()=>pick(hits[+b.dataset.i]))}
+function pick(h){hideRes();q.blur();if(h.tk!==tree)setTree(h.tk,false);const n=L.byPid.get(h.pid);if(n){kbd=n;select(n,true)}}
 
 /* ================= tree switching ================= */
 const LAYOUTS={};
 function setTree(tk,animate=true){
-  tree=tk;L=LAYOUTS[tk];selected=null;pathSet.clear();hover=null;panel.classList.remove('on');
+  tree=tk;L=LAYOUTS[tk];kbd=null;hover=null;closePanel(false);
   document.querySelectorAll('#treeSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tree===tk));
   buildMini();home(false);dirty=true;
   try{history.replaceState(null,'','#'+tk)}catch(e){}
@@ -735,10 +928,13 @@ function prep(lay){
     else if(n.role==='D'){const f=famOfKid.get(n);if(f)next=f.parents[0]}
     else if(n.role==='P'){const f=famAsParent.get(n);if(f)next=f.parents[0]}
     lay.parentNode.set(n,next)});
+  lay.famAsParent=famAsParent;lay.famOfKid=famOfKid;
+  lay.rows=new Map();lay.nodes.forEach(n=>{(lay.rows.get(n.lv)||lay.rows.set(n.lv,[]).get(n.lv)).push(n)});
+  lay.rows.forEach(r=>r.sort((a,b)=>a.x-b.x));
   return lay;
 }
 document.querySelectorAll('#treeSeg button').forEach(b=>b.onclick=()=>setTree(b.dataset.tree));
-document.getElementById('sibTog').onclick=e=>{showSibs=!showSibs;e.currentTarget.setAttribute('aria-pressed',showSibs);const c={x:view.x+VW/2/view.s,y:view.y+VH/2/view.s};relayout();dirty=true;home(false)};
+document.getElementById('sibTog').onclick=e=>{showSibs=!showSibs;e.currentTarget.setAttribute('aria-checked',showSibs);say(showSibs?'Brothers and sisters shown':'Brothers and sisters hidden. Showing the direct line only.');kbd=null;const c={x:view.x+VW/2/view.s,y:view.y+VH/2/view.s};relayout();dirty=true;home(false)};
 addEventListener('hashchange',()=>{const k=location.hash.slice(1);if((k==='kotze'||k==='tillett')&&k!==tree)setTree(k)});
 
 /* ================= boot ================= */
