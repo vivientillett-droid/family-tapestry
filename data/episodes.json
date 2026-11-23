@@ -1,0 +1,15 @@
+{
+  "series": "Threads of the Tapestry",
+  "intro": "Short stories about the people in our family tree, told by Vivien. One generation at a time, starting with the first ancestor who reached the Cape. About ten minutes each.",
+  "episodes": [
+    {"n": 1, "title": "The Man from Königstein", "who": "Jan Kotze", "year": "1652", "tree": "kotze", "blurb": "A merchant from Saxony steps off the ship Pampas into Table Bay in 1691.", "audio": ""},
+    {"n": 2, "title": "The Year of the Pox", "who": "Dirk Kotze", "year": "1692", "tree": "kotze", "blurb": "Rooi Dirk, the first of the family born in Africa, and the smallpox of 1713.", "audio": ""},
+    {"n": 3, "title": "Beyond the Mountains", "who": "Louis Coetzee", "year": "1732", "tree": "kotze", "blurb": "Pioneer farmers move inland, and the family name changes its spelling.", "audio": ""},
+    {"n": 4, "title": "When the Flags Changed", "who": "Gerhardus Dirk Kotzé", "year": "1761", "tree": "kotze", "blurb": "Dutch, then British, then Dutch, then British again, in one lifetime.", "audio": ""},
+    {"n": 5, "title": "Wagons North", "who": "Johannes Jurgen Kotzé", "year": "1791", "tree": "kotze", "blurb": "The end of slavery, the Great Trek, and a life that ended near Harrismith.", "audio": ""},
+    {"n": 6, "title": "The Republics", "who": "Philip Daniel Riekert Kotzé", "year": "1835", "tree": "kotze", "blurb": "Boer republics, diamonds and gold.", "audio": ""},
+    {"n": 7, "title": "The War Years", "who": "Jacobus Kotzé", "year": "1865", "match": "1965", "tree": "kotze", "blurb": "The Anglo-Boer War and the years of rebuilding.", "audio": ""},
+    {"n": 8, "title": "Machadodorp", "who": "Gerhardus Dirk Kotzé", "year": "1914", "tree": "kotze", "blurb": "Depression, war, and a wedding in Machadodorp in 1951.", "audio": ""},
+    {"n": 9, "title": "The Weaver", "who": "Dorethea", "year": "1966", "tree": "kotze", "blurb": "The season finale, about the person who wove this tapestry together.", "audio": ""}
+  ]
+}

@@ -28,7 +28,17 @@ button{font-family:inherit;color:inherit}
 .corner.tr{top:6px;right:6px;transform:scaleX(-1)}
 
 /* toolbar */
-.bar{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:5;display:flex;align-items:center;gap:12px;
+.top{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:6px;max-width:calc(100vw - 20px);pointer-events:none}
+.top>*{pointer-events:auto}
+.title{display:flex;align-items:center;gap:10px;font-family:var(--caps);font-size:31px;letter-spacing:.06em;color:var(--ink);white-space:nowrap;
+  padding:2px 18px;border-radius:26px;background:rgba(243,234,215,.82);pointer-events:none}
+.title img{height:30px;width:auto}
+.title img.flip{transform:scaleX(-1)}
+.tbtn{display:inline-flex;align-items:center;gap:7px;border:2px solid var(--line);background:var(--cream);border-radius:24px;padding:5px 13px 5px 9px;min-height:40px;
+  font:700 15.5px var(--serif);color:var(--ink);cursor:pointer;white-space:nowrap}
+.tbtn:hover{background:#fff}
+.tbtn svg{flex:none}
+.bar{position:relative;display:flex;align-items:center;gap:12px;
   padding:7px 8px 7px 14px;background:var(--panel);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   border:2px solid var(--line);border-radius:40px;box-shadow:0 6px 22px rgba(61,47,28,.16);max-width:calc(100vw - 20px)}
 .brand{display:flex;align-items:center;gap:8px;font-family:var(--caps);font-size:19px;letter-spacing:.05em;white-space:nowrap}
@@ -126,7 +136,9 @@ button{font-family:inherit;color:inherit}
   .search input{width:170px;font-size:16px}
   .legend,.mini{display:none}
   .zoom{bottom:16px}
-  .bar{gap:6px;padding-left:8px;top:10px}
+  .bar{gap:6px;padding-left:8px}
+  .title{font-size:24px}.title img{height:24px}
+  .tbtn span{display:none}.tbtn{padding:5px 8px;width:44px;justify-content:center}
   .seg button{padding:6px 9px;font-size:14px}
   .tog span{display:none}
   .hint{white-space:normal;width:86vw;text-align:center;font-size:14px;top:70px}
@@ -142,7 +154,7 @@ button,a,input{touch-action:manipulation}
 :focus-visible{outline:3px solid #8a3f12;outline-offset:2px;border-radius:12px}
 #cv:focus-visible{outline:none}
 .facts .k{color:var(--goldtext)}
-.bar{top:calc(14px + var(--sat))}
+.top{top:calc(10px + var(--sat))}
 .zoom{right:calc(16px + var(--sar));bottom:calc(186px + var(--sab))}
 .mini{right:calc(16px + var(--sar));bottom:calc(16px + var(--sab))}
 .legend{left:calc(16px + var(--sal));bottom:calc(16px + var(--sab))}
@@ -178,16 +190,17 @@ kbd{font-family:inherit;font-weight:700;border:1.5px solid var(--line);border-bo
 
 /* ===== phones: bottom sheet & compact toolbar ===== */
 @media (max-width:640px){
-  .bar{left:calc(8px + var(--sal));right:calc(8px + var(--sar));transform:none;max-width:none;top:calc(8px + var(--sat));padding:5px 5px 5px 6px;gap:5px;border-radius:30px}
+  .top{left:calc(8px + var(--sal));right:calc(8px + var(--sar));transform:none;max-width:none;top:calc(6px + var(--sat));gap:4px}
+  .title{font-size:21px;padding:0 12px}.title img{height:20px}
+  .bar{width:100%;flex-wrap:wrap;justify-content:center;padding:6px;gap:6px;border-radius:24px}
   .seg{flex:none}
   .seg button{padding:6px 10px;font-size:14.5px}
-  .search{flex:1;min-width:0}
+  .search{flex:1 1 100%;min-width:0;order:9}
   .search input{width:100%;font-size:16px;padding:9px 10px 9px 30px}
-  .results{position:fixed;left:calc(8px + var(--sal));right:calc(8px + var(--sar));top:calc(70px + var(--sat));width:auto;max-height:60vh}
+  .results{left:0;right:0;width:auto;max-height:55vh}
   .tog{padding:4px 2px}
   .zoom{bottom:calc(12px + var(--sab));right:calc(10px + var(--sar));flex-direction:row;gap:6px}
   .zoom button{width:44px;height:44px}
-  .hint{top:calc(112px + var(--sat))}
   .panel{top:auto;left:0;right:0;bottom:0;width:100%;height:min(72vh,72dvh);border-left:0;border-top:2px solid var(--line);border-radius:22px 22px 0 0;
     transform:translateY(105%);box-shadow:0 -10px 30px rgba(61,47,28,.18);padding-bottom:var(--sab);overscroll-behavior:contain}
   .panel.on{transform:translateY(var(--drag,0px))}
@@ -199,6 +212,52 @@ kbd{font-family:inherit;font-weight:700;border:1.5px solid var(--line);border-bo
   .panel .pname{font-size:26px}
   body.sheet-open .zoom{display:none}
 }
+
+/* keep the title bar clear of an open side panel on desktop and tablet */
+@media (min-width:641px){
+  .top{transition:left .35s cubic-bezier(.2,.8,.2,1)}
+  body.sheet-open .top{left:calc((100vw - min(410px,100vw))/2);max-width:calc(100vw - 430px)}
+  body.sheet-open .bar{flex-wrap:wrap;justify-content:center}
+  body.sheet-open .title{font-size:min(31px,3vw)}
+}
+/* ===== episodes panel ===== */
+.eps .ephead{display:flex;flex-direction:column;align-items:center;text-align:center;padding:18px 0 4px}
+.eps .ephead img{width:120px;height:auto;margin-bottom:4px}
+.eps h2{font-family:var(--caps);font-weight:400;font-size:26px;letter-spacing:.04em;margin:0;line-height:1.1}
+.eps .intro{font-size:17px;line-height:1.45;color:var(--ink2);margin:10px 0 6px;text-align:center}
+.eplist{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:12px}
+.ep{border:1.5px solid var(--line);border-radius:16px;background:var(--cream);padding:14px 16px 14px 14px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px}
+.ep .no{grid-row:span 4;width:46px;height:46px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-family:var(--caps);font-size:21px;background:var(--apricot)}
+.ep h3{margin:0;font-size:21px;font-weight:700;line-height:1.15;font-family:var(--serif);color:var(--ink);letter-spacing:0;display:block}
+.ep h3:after{display:none}
+.ep .who{font-size:16px;font-style:italic;color:var(--ink2)}
+.ep p{margin:4px 0 0;font-size:16.5px;line-height:1.4}
+.ep .row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px}
+.ep audio{width:100%;margin-top:8px}
+.ep .soon{font-family:var(--caps);font-size:12.5px;letter-spacing:.1em;padding:4px 10px;border-radius:12px;background:rgba(201,199,158,.5);color:var(--ink2)}
+.ep .find{border:1.5px solid var(--line);background:#fff;border-radius:18px;padding:6px 12px;min-height:40px;font:700 15px var(--serif);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.ep .find:hover{background:var(--parch)}
+
+/* ===== guided walkthrough ===== */
+.tour{position:fixed;inset:0;z-index:20}
+.tour[hidden]{display:none}
+.tour .spot{position:fixed;border-radius:18px;box-shadow:0 0 0 4px #fbf4e4,0 0 0 8px #a62b1f,0 0 0 9999px rgba(40,28,12,.58);pointer-events:none;
+  transition:left .35s ease,top .35s ease,width .35s ease,height .35s ease}
+.tour .spot.none{width:0!important;height:0!important;left:50%!important;top:40%!important;box-shadow:0 0 0 9999px rgba(40,28,12,.58)}
+.tour .spot:not(.none){animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 4px #fbf4e4,0 0 0 12px #a62b1f,0 0 0 9999px rgba(40,28,12,.58)}}
+.tcard{position:fixed;width:min(440px,calc(100vw - 24px));background:var(--cream);border:2.5px solid var(--line);border-radius:20px;padding:20px 22px 14px;
+  box-shadow:0 20px 50px rgba(0,0,0,.35);transition:left .35s ease,top .35s ease}
+.tstep{font-family:var(--caps);font-size:14px;letter-spacing:.12em;color:var(--goldtext)}
+.tcard h2{font-family:var(--caps);font-weight:400;font-size:25px;line-height:1.15;margin:4px 0 8px}
+.tcard p{font-size:19.5px;line-height:1.45;margin:0}
+.tnav{display:flex;gap:10px;margin-top:16px}
+.tb{flex:1;min-height:52px;border-radius:26px;border:2px solid var(--line);background:#a62b1f;color:#fff;font:700 19px var(--serif);cursor:pointer}
+.tb:hover{background:#8e2318}
+.tb.ghost{background:var(--cream);color:var(--ink)}
+.tb.ghost:hover{background:#fff}
+.tb[disabled]{visibility:hidden}
+.tskip{display:block;margin:10px auto 0;border:0;background:none;font:600 16px var(--serif);color:var(--ink2);text-decoration:underline;cursor:pointer;min-height:40px}
 </style>
 </head>
 <body>
@@ -207,8 +266,9 @@ kbd{font-family:inherit;font-weight:700;border:1.5px solid var(--line);border-bo
 <img class="corner tl" src="orn/corner-gold.webp" alt="">
 <img class="corner tr" src="orn/corner-gold.webp" alt="">
 
-<header class="bar">
-  <div class="brand"><img src="orn/flower.webp" alt=""><span>The Family Tapestry</span></div>
+<header class="top">
+  <div class="title" aria-hidden="true"><img src="orn/flower.webp" alt=""><span>The Family Tapestry</span><img src="orn/flower.webp" alt="" class="flip"></div>
+  <div class="bar">
   <div class="seg" id="treeSeg" role="group" aria-label="Choose family tree">
     <button data-tree="kotze" aria-pressed="true">Kotzé &amp; Pieterse</button>
     <button data-tree="tillett" aria-pressed="false">Tillett</button>
@@ -218,6 +278,11 @@ kbd{font-family:inherit;font-weight:700;border:1.5px solid var(--line);border-bo
     <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="#5a4520" stroke-width="1.8"/><path d="M11 11l4 4" stroke="#5a4520" stroke-width="1.8" stroke-linecap="round"/></svg>
     <input id="q" type="search" placeholder="Find a person…" autocomplete="off" aria-label="Find a person by name" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="results">
     <div class="results" id="results" role="listbox" aria-label="Search results"></div>
+  </div>
+  <button class="tbtn" id="tourBtn" aria-label="Show me how to use this page" title="Show me how to use this page">
+    <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="13.5" cy="3.6" r="2.3" fill="#5a4520"/><path d="M12.2 7.4l-3.3 2.2-1.3 4M12.2 7.4l1.6 5.3 3.4 2.2M12.2 7.4l-.4 6.4-3.3 4.4-1.4 3.6M11.8 13.8l2.6 3.6.6 4.4" fill="none" stroke="#5a4520" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Show me how</span></button>
+  <button class="tbtn" id="epBtn" aria-label="Listen to the episodes" title="Listen to the episodes" aria-haspopup="dialog" aria-controls="eps">
+    <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0116 0v3" fill="none" stroke="#5a4520" stroke-width="2.1" stroke-linecap="round"/><rect x="2.5" y="13.5" width="5" height="7.5" rx="2" fill="#b9672f" stroke="#5a4520" stroke-width="1.6"/><rect x="16.5" y="13.5" width="5" height="7.5" rx="2" fill="#b9672f" stroke="#5a4520" stroke-width="1.6"/></svg><span>Episodes</span></button>
   </div>
 </header>
 <canvas id="cv" tabindex="0" role="application" aria-roledescription="family tree" aria-label="Family tree" aria-describedby="cvhelp"></canvas>
@@ -243,10 +308,22 @@ kbd{font-family:inherit;font-weight:700;border:1.5px solid var(--line);border-bo
 <div class="mini" id="mini" title="Tap to jump" aria-hidden="true"><canvas id="mcv"></canvas></div>
 
 <aside class="panel" id="panel" role="dialog" aria-modal="false" aria-labelledby="pname" hidden><div class="inner" id="pinner"></div></aside>
+<aside class="panel eps" id="eps" role="dialog" aria-modal="false" aria-labelledby="epst" hidden><div class="inner" id="epsin"></div></aside>
+<div class="tour" id="tour" role="dialog" aria-modal="true" aria-labelledby="tourt" hidden>
+  <div class="spot" id="spot" aria-hidden="true"></div>
+  <div class="tcard" id="tcard">
+    <div class="tstep" id="tstep"></div>
+    <h2 id="tourt"></h2>
+    <p id="ttext"></p>
+    <div class="tnav"><button class="tb ghost" id="tback">Back</button><button class="tb" id="tnext">Next</button></div>
+    <button class="tskip" id="tskip">Close the guide</button>
+  </div>
+</div>
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Source record"><button class="lbclose" aria-label="Close record"><svg width="16" height="16" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="#5a4520" stroke-width="2" stroke-linecap="round"/></svg></button><figure><img alt="A screenshot of one of Mom's FamilySearch source records"><figcaption>One of Mom's source records · tap outside or press Escape to close</figcaption></figure></div>
 <div class="dlg" id="help" role="dialog" aria-modal="true" aria-labelledby="helpt"><div class="card">
   <button class="x" aria-label="Close help"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="#5a4520" stroke-width="2" stroke-linecap="round"/></svg></button>
   <h2 id="helpt">How to explore</h2>
+  <p style="font-size:16.5px;margin:4px 0 0">For a step-by-step guide, press <b>Show me how</b> (the walking person) at the top of the page.</p>
   <h3>On a phone or tablet</h3>
   <ul><li><b>Drag</b> with one finger to wander; flick to glide.</li><li><b>Pinch</b> to zoom in and out.</li><li><b>Double-tap</b> to zoom in; <b>tap with two fingers</b> to zoom out.</li><li><b>Tap</b> anyone to meet them. Swipe the details card down to close it, or up to read more.</li></ul>
   <h3>With a keyboard</h3>
@@ -255,7 +332,8 @@ kbd{font-family:inherit;font-weight:700;border:1.5px solid var(--line);border-bo
   <div class="lg"><b style="background:#c9c79e"></b>Fathers in the line<b style="background:#f2c48d"></b>Mothers in the line<b style="background:#fbf4e4"></b>Brothers, sisters and others
   <svg width="20" height="22" viewBox="0 0 14 17" aria-hidden="true"><path d="M1 1h8l4 4v11H1z" fill="#fffaf0" stroke="#8a4b22" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 1v4h4M3.5 8h7M3.5 11h7M3.5 14h4" fill="none" stroke="#8a4b22" stroke-width="1.1"/></svg>Mom left a note
   <svg width="20" height="20" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="#d4af5c" stroke="#5a4520" stroke-width="1.3"/><path d="M9 3.6l1.3 3.4 3.6.2-2.8 2.3.9 3.5L9 11l-3 2 .9-3.5L4.1 7.2l3.6-.2z" fill="#fbf4e4"/></svg>A story from history
-  <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="10" fill="#fbf4e4" stroke="#5a4520" stroke-width="1.5"/><circle cx="8.5" cy="11" r="4.5" fill="none" stroke="#b8913f" stroke-width="1.6"/><circle cx="13.5" cy="11" r="4.5" fill="none" stroke="#b9672f" stroke-width="1.6"/></svg>Married (a heart means partners)</div>
+  <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="10" fill="#fbf4e4" stroke="#5a4520" stroke-width="1.5"/><circle cx="8.5" cy="11" r="4.5" fill="none" stroke="#b8913f" stroke-width="1.6"/><circle cx="13.5" cy="11" r="4.5" fill="none" stroke="#b9672f" stroke-width="1.6"/></svg>Married (a heart means partners)
+  <svg width="22" height="10" viewBox="0 0 22 10" aria-hidden="true"><path d="M1 5h20" stroke="#fbf4e4" stroke-width="8" stroke-linecap="round"/><path d="M1 5h20" stroke="#a62b1f" stroke-width="4" stroke-linecap="round"/></svg>The red line links the person you chose to the family below</div>
 </div></div>
 <div class="loading" id="loading" role="status"><div><img src="orn/lady.webp" alt="">Weaving the family tapestry…</div></div>
 
@@ -263,7 +341,7 @@ kbd{font-family:inherit;font-weight:700;border:1.5px solid var(--line);border-bo
 (()=>{
 /* ================= constants ================= */
 const W=200,H=112,SG=16,FG=64,CG=120,RH=H+190,PAD=900;
-const COL={line:'#5a4520',olive:'#8e8e52',sage:'#c9c79e',apricot:'#f2c48d',cream:'#fbf4e4',gold:'#d4af5c',gold2:'#b8913f',ink:'#3d2f1c',ink2:'#6e5a3e',terra:'#b9672f'};
+const COL={line:'#5a4520',olive:'#8e8e52',sage:'#c9c79e',apricot:'#f2c48d',cream:'#fbf4e4',gold:'#d4af5c',gold2:'#b8913f',ink:'#3d2f1c',ink2:'#6e5a3e',terra:'#b9672f',red:'#a62b1f'};
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 const mcv=document.getElementById('mcv'),mctx=mcv.getContext('2d');
 let DPR=Math.min(devicePixelRatio||1,2),VW=0,VH=0;
@@ -425,8 +503,9 @@ function marrText(m){
 
 /* ================= view ================= */
 function resize(){VW=innerWidth;VH=innerHeight;const qi=document.getElementById('q');if(qi)qi.placeholder=VW<=900?'Search names':'Find a person…';requestAnimationFrame(()=>{const bb=document.querySelector('.bar').getBoundingClientRect().bottom;document.getElementById('hint').style.top=(bb+(VW<900?50:8))+'px'});cv.width=VW*DPR;cv.height=VH*DPR;dirty=true;buildMini()}
+const topH=()=>{const b=document.querySelector('.bar');return b?b.getBoundingClientRect().bottom:90};
 function fitAll(animate=true){
-  const top=90,bot=30;const s=Math.min((VW-60)/L.width,(VH-top-bot)/L.height);
+  const top=topH()+16,bot=30;const s=Math.min((VW-60)/L.width,(VH-top-bot)/L.height);
   go({s,x:L.width/2-VW/2/s,y:L.height/2-(top+(VH-top-bot)/2)/s},animate);
 }
 function home(animate=true){
@@ -435,9 +514,10 @@ function home(animate=true){
   const narrow=VW<=900;
   const s=Math.max(.3,Math.min(1,VH/(RH*(narrow?2.4:3.2)),VW/(narrow?700:760)));
   const cx=f.mx,cy=narrow?f.kids[0].y-RH*0.45:f.kids[0].y-RH*0.9;
-  go(clampV({s,x:cx-VW/2/s,y:cy-VH/2/s}),animate);
+  const th=topH(),midY=th+(VH-th)/2;
+  go(clampV({s,x:cx-VW/2/s,y:cy-midY/s}),animate);
 }
-const minS=()=>Math.min((VW-40)/L.width,(VH-120)/L.height)*0.9;
+const minS=()=>Math.min((VW-40)/L.width,(VH-topH()-40)/L.height)*0.9;
 function clampV(v){
   v.s=Math.max(minS(),Math.min(2.2,v.s));
   const vw=VW/v.s,vh=VH/v.s,m=0.45;
@@ -511,13 +591,16 @@ function draw(){
     }
     ctx.stroke();
   }
-  // highlighted path (gold)
+  // highlighted path: bold red thread with a cream halo so it stands out from the brown vines
   if(pathSet.size){
-    ctx.strokeStyle=COL.gold;ctx.lineWidth=Math.max(4,2/s);ctx.beginPath();
+    ctx.beginPath();
     for(const f of fl){const a=f.kids.find(n=>pathSet.has(n));if(!a)continue;
       const stemTop=f.parents.length===2?f.my+26:f.parents[0].y+H;
       ctx.moveTo(f.mx,stemTop);ctx.lineTo(f.mx,f.barY);ctx.lineTo(a.x+W/2,f.barY);ctx.lineTo(a.x+W/2,a.y-4)}
-    ctx.stroke();
+    ctx.lineJoin='round';ctx.lineCap='round';
+    ctx.strokeStyle='rgba(251,244,228,.95)';ctx.lineWidth=Math.max(11,5.5/s);ctx.stroke();
+    ctx.strokeStyle=COL.red;ctx.lineWidth=Math.max(6,3/s);ctx.stroke();
+    ctx.lineJoin='miter';ctx.lineCap='butt';
   }
   // leaves at bar ends
   if(s>0.12&&ok(ORN.leaf)){
@@ -584,7 +667,8 @@ function card(n,s){
   ctx.fillStyle='rgba(61,47,28,.13)';cardPath(x+4,y+6,W,H);ctx.fill();
   cardPath(x,y,W,H);ctx.fillStyle=fill(n);ctx.fill();
   ctx.lineWidth=Math.max(sel?4.5:2.6,(sel?2.2:1.1)/s);ctx.strokeStyle=sel?COL.gold2:hov?COL.terra:COL.line;ctx.stroke();
-  if(onPath&&!sel){ctx.lineWidth=Math.max(3,1.2/s);ctx.strokeStyle=COL.gold;cardPath(x-5,y-5,W+10,H+10);ctx.stroke()}
+  if(onPath&&!sel){ctx.lineWidth=Math.max(3.5,1.6/s);ctx.strokeStyle=COL.red;cardPath(x-5,y-5,W+10,H+10);ctx.stroke()}
+  if(sel){ctx.lineWidth=Math.max(4.5,2.2/s);ctx.strokeStyle=COL.red;cardPath(x-6,y-6,W+12,H+12);ctx.stroke()}
   if(kbd===n&&document.activeElement===cv){ctx.save();ctx.setLineDash([10,7]);ctx.lineWidth=Math.max(4,2.4/s);ctx.strokeStyle='#8a3f12';cardPath(x-9,y-9,W+18,H+18);ctx.stroke();ctx.restore()}
   if(n.role==='R'){ctx.lineWidth=Math.max(1.4,.6/s);ctx.strokeStyle=COL.gold2;cardPath(x+6,y+6,W-12,H-12);ctx.stroke()}
   // text — always inside the card, sized for the zoom level
@@ -675,7 +759,7 @@ function drawGenLabels(s){
   const step=rowPx<44?3:rowPx<70?2:1;
   for(const g of L.gens){
     if(g.lv%step)continue;
-    const sy=(g.y+H/2-view.y)*s;if(sy<130||sy>VH-70)continue;
+    const sy=(g.y+H/2-view.y)*s;if(sy<topH()+24||sy>VH-70)continue;
     const label=g.lv<0?'Next generation':g.lv===0?'You':g.lv===1?'Parents':g.lv===2?'Grandparents':g.lv===3?'Great-grandparents':(g.lv-2)+'× great-grandparents';
     ctx.strokeStyle='rgba(90,69,32,.35)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(14,sy+18);ctx.lineTo(railW-40,sy+18);ctx.stroke();
     ctx.fillStyle=COL.ink2;ctx.font='400 13px "Marcellus SC",serif';ctx.fillText(label,16,sy-2);
@@ -764,9 +848,9 @@ function neighbour(n,dir){
   if(dir==='down'){const nx=L.parentNode.get(n);if(nx)return nx;const f=L.famAsParent.get(n);return f?f.kids[0]:null}
   const row=L.rows.get(n.lv)||[];const i=row.indexOf(n);return row[i+(dir==='left'?-1:1)]||null;
 }
-function anyDialogOpen(){return lb.classList.contains('on')||helpDlg.classList.contains('on')}
+function anyDialogOpen(){return lb.classList.contains('on')||helpDlg.classList.contains('on')||!tour.hidden}
 addEventListener('keydown',e=>{
-  if(e.key==='Escape'){if(lb.classList.contains('on'))return closeLB();if(helpDlg.classList.contains('on'))return closeHelp();if(panel.classList.contains('on')){closePanel(true);return}return}
+  if(e.key==='Escape'){if(lb.classList.contains('on'))return closeLB();if(helpDlg.classList.contains('on'))return closeHelp();if(panel.classList.contains('on')){closePanel(true);return}if(eps.classList.contains('on')){closeEps(true);return}return}
   if(anyDialogOpen())return;
   const t=e.target;if(t.tagName==='INPUT'||(t!==cv&&t!==document.body))return;
   const dirs={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};
@@ -812,6 +896,7 @@ function relatives(pid){
 function chip(pid){const p=T.P[pid],n=L.byPid.get(pid);const sw=n?(n.role==='F'?'#c9c79e':n.role==='M'?'#f2c48d':'#fbf4e4'):'transparent';
   return `<button class="chip" data-pid="${pid}" ${n?'':'disabled title="Not shown on this view"'}><i style="background:${sw}"></i>${esc(p.name.length>34?p.name.slice(0,33)+'…':p.name)} ${p.span?`<small>${esc(p.span)}</small>`:''}</button>`}
 function select(n,fly){
+  if(eps.classList.contains('on'))closeEps(false);
   selected=n;pathSet.clear();
   // path to root
   let cur=n,guard=0;const parentOf=L.parentNode;while(cur&&guard++<200){pathSet.add(cur);cur=parentOf.get(cur)}
@@ -906,6 +991,104 @@ function renderRes(){showRes();
   res.querySelectorAll('[role=option][data-i]').forEach(b=>b.onclick=()=>pick(hits[+b.dataset.i]))}
 function pick(h){hideRes();q.blur();if(h.tk!==tree)setTree(h.tk,false);const n=L.byPid.get(h.pid);if(n){kbd=n;select(n,true)}}
 
+/* ================= episodes ================= */
+const eps=document.getElementById('eps'),epsin=document.getElementById('epsin');let EP=null,epsReturn=null,epsBuilt=false;
+const XSVG='<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="#5a4520" stroke-width="2" stroke-linecap="round"/></svg>';
+async function loadEps(){if(!EP){try{EP=await (await fetch('data/episodes.json')).json()}catch(e){EP={series:'Threads of the Tapestry',intro:'',episodes:[]}}}return EP}
+function findPerson(e){const nn=norm(e.who),yr=e.match||e.year,lay=LAYOUTS[e.tree||'kotze'];let best=null;
+  for(const n of lay.nodes){const p=T.P[n.pid];if(!(p.n===nn||p.n.startsWith(nn+' ')||p.n.startsWith(nn)))continue;
+    if(yr&&T.persons[n.pid].t.includes(yr))return n;if(!best)best=n}return best}
+async function openEps(){const d=await loadEps();
+  if(panel.classList.contains('on'))closePanel(false);
+  epsReturn=document.activeElement;
+  if(!epsBuilt){epsBuilt=true;
+    epsin.innerHTML=`<div class="phead"><span class="sheet-handle" aria-hidden="true"></span><img class="pc" src="orn/corner-calla.webp" alt=""><span class="badge" style="background:#f2c48d">Listen</span>
+      <button class="close" aria-label="Close episodes">${XSVG}</button></div>
+      <div class="ephead"><img src="orn/lady.webp" alt=""><h2 id="epst" tabindex="-1">${esc(d.series)}</h2></div>
+      <p class="intro">${esc(d.intro)}</p>
+      <ol class="eplist">${d.episodes.map((e,i)=>`<li class="ep"><span class="no" aria-hidden="true">${e.n}</span>
+        <h3>Episode ${e.n}: ${esc(e.title)}</h3><div class="who">${esc(e.who)}, born ${esc(e.year)}</div><p>${esc(e.blurb)}</p>
+        <div class="row">${e.audio?'':`<span class="soon">Coming soon</span>`}<button class="find" data-i="${i}" aria-label="Find ${esc(e.who)} on the tree">
+          <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="#5a4520" stroke-width="1.8"/><path d="M11 11l4 4" stroke="#5a4520" stroke-width="1.8" stroke-linecap="round"/></svg>Find on the tree</button></div>
+        ${e.audio?`<audio controls preload="none" src="${esc(e.audio)}" aria-label="Play episode ${e.n}: ${esc(e.title)}"></audio>`:''}</li>`).join('')}</ol>
+      <img src="orn/corner-lily.webp" alt="" style="width:96px;display:block;margin:28px 0 0 auto;transform:scale(-1,-1);opacity:.9">`;
+    epsin.querySelector('.close').onclick=()=>closeEps(true);
+    epsin.querySelectorAll('.find').forEach(b=>b.onclick=()=>{const e=d.episodes[+b.dataset.i];
+      if((e.tree||'kotze')!==tree)setTree(e.tree||'kotze',false);
+      const n=findPerson(e);closeEps(false);if(n){kbd=n;select(n,true)}else say('Could not find '+e.who+' on this tree.')});
+  }
+  eps.hidden=false;eps.scrollTop=0;
+  requestAnimationFrame(()=>{eps.classList.add('on');document.body.classList.add('sheet-open')});
+  setTimeout(()=>{const h=document.getElementById('epst');if(h)h.focus({preventScroll:true})},60);
+  say('Episodes opened.');
+}
+function closeEps(restore){if(!eps.classList.contains('on'))return;eps.classList.remove('on');
+  if(!panel.classList.contains('on'))document.body.classList.remove('sheet-open');
+  setTimeout(()=>{if(!eps.classList.contains('on'))eps.hidden=true},380);
+  if(restore){const f=(epsReturn&&document.contains(epsReturn)&&epsReturn!==document.body)?epsReturn:cv;f.focus({preventScroll:true})}}
+document.getElementById('epBtn').onclick=()=>{if(eps.classList.contains('on'))closeEps(true);else openEps()};
+
+/* ================= guided walkthrough ================= */
+const tour=document.getElementById('tour'),spot=document.getElementById('spot'),tcard=document.getElementById('tcard');
+const tstep=document.getElementById('tstep'),ttl=document.getElementById('tourt'),ttx=document.getElementById('ttext'),tback=document.getElementById('tback'),tnext=document.getElementById('tnext');
+let ti=0,tReturn=null,tTimer=0;
+const coarse=()=>matchMedia('(pointer:coarse)').matches;
+function demoNode(){const f=L.rootFam;const mum=f.parents[f.parents.length-1];
+  return L.nodes.find(n=>L.parentNode.get(n)===mum)||mum}
+const STEPS=[
+  {t:'Welcome',x:()=>'This is our family tree, woven like a tapestry. This short guide shows you how to look around, one step at a time. Press Next to begin.'},
+  {t:'Moving around',x:()=>coarse()?'Put one finger on the tree and slide it, the way you would slide a photo across a table. Lift your finger to stop.':'Click and hold anywhere on the tree, then move the mouse to slide it around. Let go of the button to stop.',
+    area:()=>{const th=topH();return {left:VW*0.12,top:th+30,width:VW*0.76,height:Math.max(120,(VH-th)*0.5)}}},
+  {t:'Closer or further away',x:()=>'Press the plus button to come closer, and the minus button to step back.'+(coarse()?' You can also pinch with two fingers.':' The wheel on your mouse works too.'),el:()=>document.getElementById('zin').parentElement},
+  {t:'Back to the start',x:()=>'Feeling lost? Press the little house and the tree goes straight back to where you started.',el:()=>document.getElementById('zhome')},
+  {t:'Meet someone',x:()=>'Every box is a person. '+(coarse()?'Tap':'Click')+' on a box to read about them. Let’s open one together.',
+    pre:()=>{closePanel(false);closeEps(false);flyTo(demoNode(),false);return 780},el:()=>{const n=demoNode(),r=cv.getBoundingClientRect();
+      return {left:(n.x-view.x)*view.s+r.left,top:(n.y-view.y)*view.s+r.top,width:W*view.s,height:H*view.s}}},
+  {t:'Their story',x:()=>'Their details open here: dates, places, Mom’s notes and stories from history. The red line on the tree shows how they connect to the family below.',
+    pre:()=>{select(demoNode(),true);return 780},el:()=>panel},
+  {t:'Closing the details',x:()=>'When you are finished, press the round × button at the top to close the details.',pre:()=>{if(!panel.classList.contains('on')){select(demoNode(),true);return 650}return 0},el:()=>panel.querySelector('.close')},
+  {t:'Two family trees',x:()=>'There are two trees: the Kotzé & Pieterse family and the Tillett family. Press either name to switch between them.',
+    pre:()=>{closePanel(false);home();return 500},el:()=>document.getElementById('treeSeg')},
+  {t:'Find a person',x:()=>'Looking for someone? Type part of their name in this box, then choose them from the list that appears.',el:()=>document.querySelector('.search')},
+  {t:'Listen to the stories',x:()=>'Press Episodes to listen to our family history stories, in order, one generation at a time.',el:()=>document.getElementById('epBtn')},
+  {t:'You’re ready',x:()=>'You can watch this guide again at any time. Just press the walking person at the top of the page. Enjoy exploring!',el:()=>document.getElementById('tourBtn')}
+];
+function placeTour(){const st=STEPS[ti];let r=null;
+  if(st.area)r=st.area();else if(st.el){const e=st.el();if(e&&e.getBoundingClientRect){const b=e.getBoundingClientRect();if(b.width)r={left:b.left,top:b.top,width:b.width,height:b.height}}else if(e)r=e}
+  const pad=8;
+  if(r){r={left:Math.max(4,r.left-pad),top:Math.max(4,r.top-pad),width:Math.min(VW-8,r.width+pad*2),height:Math.min(VH-8,r.height+pad*2)};
+    spot.classList.remove('none');Object.assign(spot.style,{left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'})}
+  else{spot.classList.add('none')}
+  const cw=tcard.offsetWidth,ch=tcard.offsetHeight,m=12;let x,y;
+  if(!r){x=(VW-cw)/2;y=Math.max(m,(VH-ch)/2)}
+  else if(r.top+r.height+ch+m*2<=VH){y=r.top+r.height+m;x=r.left+r.width/2-cw/2}
+  else if(r.top-ch-m*2>=0){y=r.top-ch-m;x=r.left+r.width/2-cw/2}
+  else if(r.left-cw-m*2>=0){x=r.left-cw-m;y=r.top+r.height/2-ch/2}
+  else if(r.left+r.width+cw+m*2<=VW){x=r.left+r.width+m;y=r.top+r.height/2-ch/2}
+  else{x=(VW-cw)/2;y=(r.top+r.height/2>VH/2)?m:VH-ch-m}
+  x=Math.max(m,Math.min(VW-cw-m,x));y=Math.max(m,Math.min(VH-ch-m,y));
+  tcard.style.left=x+'px';tcard.style.top=y+'px';
+}
+function showStep(i){ti=i;const st=STEPS[i];clearTimeout(tTimer);
+  tstep.textContent=`Step ${i+1} of ${STEPS.length}`;ttl.textContent=st.t;ttx.textContent=st.x();
+  tback.disabled=i===0;tnext.textContent=i===0?'Show me':i===STEPS.length-1?'Finish':'Next';
+  const wait=st.pre?st.pre():0;
+  spot.classList.add('none');placeTour();
+  tTimer=setTimeout(()=>{placeTour();tnext.focus({preventScroll:true})},wait+60);
+  say(`Step ${i+1} of ${STEPS.length}. ${st.t}. ${ttx.textContent}`);
+}
+function startTour(){tReturn=document.activeElement;hideHint();hideRes();closeEps(false);tour.hidden=false;showStep(0)}
+function endTour(){clearTimeout(tTimer);tour.hidden=true;closePanel(false);home();
+  try{localStorage.setItem('ft-tour-seen','1')}catch(e){}
+  const f=document.getElementById('tourBtn');f.focus({preventScroll:true})}
+tnext.onclick=()=>{if(ti<STEPS.length-1)showStep(ti+1);else endTour()};
+tback.onclick=()=>{if(ti>0)showStep(ti-1)};
+document.getElementById('tskip').onclick=endTour;
+document.getElementById('tourBtn').onclick=startTour;
+tour.addEventListener('keydown',e=>{trap(tour,e);if(e.key==='Escape'){e.stopPropagation();endTour()}
+  else if(e.key==='ArrowRight'&&e.target.tagName!=='INPUT'){tnext.click()}else if(e.key==='ArrowLeft'){tback.click()}});
+addEventListener('resize',()=>{if(!tour.hidden)placeTour()});
+
 /* ================= tree switching ================= */
 const LAYOUTS={};
 function setTree(tk,animate=true){
@@ -950,6 +1133,8 @@ addEventListener('hashchange',()=>{const k=location.hash.slice(1);if((k==='kotze
   if(document.fonts)document.fonts.ready.then(()=>dirty=true);
   document.getElementById('loading').classList.add('off');
   requestAnimationFrame(frame);
+  let seen=false;try{seen=!!localStorage.getItem('ft-tour-seen')}catch(e){seen=true}
+  if(!seen)setTimeout(()=>{if(tour.hidden)startTour()},1200);
 })();
 })();
 </script>
