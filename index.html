@@ -1033,7 +1033,7 @@ const coarse=()=>matchMedia('(pointer:coarse)').matches;
 function demoNode(){const f=L.rootFam;const mum=f.parents[f.parents.length-1];
   return L.nodes.find(n=>L.parentNode.get(n)===mum)||mum}
 const STEPS=[
-  {t:'Welcome',x:()=>'This is our family tree, woven like a tapestry. This short guide shows you how to look around, one step at a time. Press Next to begin.'},
+  {t:'Welcome',x:()=>'This is our family tree, woven like a tapestry. This short guide shows you how to look around, one step at a time. Press \u201cShow me\u201d to begin.'},
   {t:'Moving around',x:()=>coarse()?'Put one finger on the tree and slide it, the way you would slide a photo across a table. Lift your finger to stop.':'Click and hold anywhere on the tree, then move the mouse to slide it around. Let go of the button to stop.',
     area:()=>{const th=topH();return {left:VW*0.12,top:th+30,width:VW*0.76,height:Math.max(120,(VH-th)*0.5)}}},
   {t:'Closer or further away',x:()=>'Press the plus button to come closer, and the minus button to step back.'+(coarse()?' You can also pinch with two fingers.':' The wheel on your mouse works too.'),el:()=>document.getElementById('zin').parentElement},
