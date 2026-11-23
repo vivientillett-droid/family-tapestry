@@ -67,7 +67,7 @@ button{font-family:inherit;color:inherit}
 
 /* controls */
 .zoom{position:fixed;right:16px;bottom:186px;z-index:5;display:flex;flex-direction:column;gap:7px}
-.zoom button{width:42px;height:42px;border-radius:50%;border:2px solid var(--line);background:var(--panel);cursor:pointer;font-size:21px;display:grid;place-items:center;box-shadow:0 3px 12px rgba(61,47,28,.14)}
+.zoom button{width:44px;height:44px;padding:0;border-radius:50%;border:2px solid var(--line);background:var(--cream);cursor:pointer;font-size:21px;display:grid;place-items:center;box-shadow:0 3px 12px rgba(61,47,28,.14)}
 .zoom button:hover{background:#fff}
 .mini{position:fixed;right:16px;bottom:16px;z-index:5;border:2px solid var(--line);border-radius:12px;background:var(--panel);padding:5px;box-shadow:0 6px 20px rgba(61,47,28,.15);cursor:pointer}
 .mini canvas{display:block;border-radius:7px}
@@ -273,7 +273,6 @@ kbd{font-family:inherit;font-weight:700;border:1.5px solid var(--line);border-bo
     <button data-tree="kotze" aria-pressed="true">Kotzé &amp; Pieterse</button>
     <button data-tree="tillett" aria-pressed="false">Tillett</button>
   </div>
-  <button class="tog" id="sibTog" role="switch" aria-checked="true" aria-label="Show brothers and sisters" title="Show brothers and sisters in each family"><i aria-hidden="true"></i><span aria-hidden="true">Siblings</span></button>
   <div class="search">
     <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="#5a4520" stroke-width="1.8"/><path d="M11 11l4 4" stroke="#5a4520" stroke-width="1.8" stroke-linecap="round"/></svg>
     <input id="q" type="search" placeholder="Find a person…" autocomplete="off" aria-label="Find a person by name" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="results">
@@ -286,17 +285,15 @@ kbd{font-family:inherit;font-weight:700;border:1.5px solid var(--line);border-bo
   </div>
 </header>
 <canvas id="cv" tabindex="0" role="application" aria-roledescription="family tree" aria-label="Family tree" aria-describedby="cvhelp"></canvas>
-<p id="cvhelp" class="sr-only">Use the arrow keys to move between people: up to their parents, down towards you, left and right along the same generation. Press Enter to read about the selected person. Hold Shift with the arrow keys to pan, plus and minus to zoom, H to return home, 0 to see the whole tree. Or use the search box to find someone by name.</p>
-<div class="hint" id="hint" aria-hidden="true">Generations rise upward from you · drag to wander · tap anyone to meet them</div>
+<p id="cvhelp" class="sr-only">Use the arrow keys to move between people: up to their parents, down to their children, left and right along the same generation. Press Enter to read about the selected person. Hold Shift with the arrow keys to pan, plus and minus to zoom, H to return home, 0 to see the whole tree. Or use the search box to find someone by name.</p>
+<div class="hint" id="hint" aria-hidden="true">Generation 1 is the youngest · older generations rise upward · drag to wander · tap anyone to meet them</div>
 
 <div class="zoom" role="group" aria-label="Map controls">
-  <button id="zin" title="Zoom in" aria-label="Zoom in">+</button>
-  <button id="zout" title="Zoom out" aria-label="Zoom out">−</button>
-  <button id="zhome" title="Back to Vivien &amp; Keith" aria-label="Back to the start">
-    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 9l7-6 7 6M4 8v7h10V8" fill="none" stroke="#5a4520" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
-  <button id="zhelp" class="help" title="How to use" aria-label="How to use and what the colours mean" aria-haspopup="dialog">?</button>
-  <button id="zfit" title="See the whole tree" aria-label="See the whole tree">
-    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M1 5V1h4M11 1h4v4M15 11v4h-4M5 15H1v-4" fill="none" stroke="#5a4520" stroke-width="1.8"/></svg></button>
+  <button id="zin" title="Zoom in" aria-label="Zoom in"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.5v13M3.5 10h13" fill="none" stroke="#5a4520" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button id="zout" title="Zoom out" aria-label="Zoom out"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.5 10h13" fill="none" stroke="#5a4520" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button id="zhome" title="Back to the start" aria-label="Back to the start"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2.5 10L10 3.5l7.5 6.5M5 8.6V16.5h10V8.6" fill="none" stroke="#5a4520" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button id="zfit" title="See the whole tree" aria-label="See the whole tree"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2.5 7V2.5H7M13 2.5h4.5V7M17.5 13v4.5H13M7 17.5H2.5V13" fill="none" stroke="#5a4520" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button id="zhelp" class="help" title="How to use" aria-label="How to use and what the colours mean" aria-haspopup="dialog"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 7.3a3 3 0 115.2 2c-.9.9-2.2 1.5-2.2 3.2" fill="none" stroke="#5a4520" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="16" r="1.5" fill="#5a4520"/></svg></button>
 </div>
 <div class="legend" aria-hidden="true">
   <span><b style="background:#c9c79e"></b>Fathers</span>
@@ -327,7 +324,7 @@ kbd{font-family:inherit;font-weight:700;border:1.5px solid var(--line);border-bo
   <h3>On a phone or tablet</h3>
   <ul><li><b>Drag</b> with one finger to wander; flick to glide.</li><li><b>Pinch</b> to zoom in and out.</li><li><b>Double-tap</b> to zoom in; <b>tap with two fingers</b> to zoom out.</li><li><b>Tap</b> anyone to meet them. Swipe the details card down to close it, or up to read more.</li></ul>
   <h3>With a keyboard</h3>
-  <ul><li><kbd>Tab</kbd> to the tree, then <kbd>↑</kbd> parents, <kbd>↓</kbd> towards you, <kbd>←</kbd> <kbd>→</kbd> along a generation.</li><li><kbd>Enter</kbd> opens their details, <kbd>Esc</kbd> closes.</li><li><kbd>Shift</kbd> + arrows to pan, <kbd>+</kbd> <kbd>−</kbd> to zoom, <kbd>H</kbd> home, <kbd>0</kbd> whole tree.</li></ul>
+  <ul><li><kbd>Tab</kbd> to the tree, then <kbd>↑</kbd> parents, <kbd>↓</kbd> children, <kbd>←</kbd> <kbd>→</kbd> along a generation.</li><li><kbd>Enter</kbd> opens their details, <kbd>Esc</kbd> closes.</li><li><kbd>Shift</kbd> + arrows to pan, <kbd>+</kbd> <kbd>−</kbd> to zoom, <kbd>H</kbd> home, <kbd>0</kbd> whole tree.</li></ul>
   <h3>What the colours mean</h3>
   <div class="lg"><b style="background:#c9c79e"></b>Fathers in the line<b style="background:#f2c48d"></b>Mothers in the line<b style="background:#fbf4e4"></b>Brothers, sisters and others
   <svg width="20" height="22" viewBox="0 0 14 17" aria-hidden="true"><path d="M1 1h8l4 4v11H1z" fill="#fffaf0" stroke="#8a4b22" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 1v4h4M3.5 8h7M3.5 11h7M3.5 14h4" fill="none" stroke="#8a4b22" stroke-width="1.1"/></svg>Mom left a note
@@ -749,7 +746,7 @@ function drawGenLabels(s){
   if(!railW){ // compact chip: which generation is in the middle of the screen
     const cy=view.y+VH*0.45/s;let best=null,bd=1e9;for(const g of L.gens){const d=Math.abs(g.y+H/2-cy);if(d<bd){bd=d;best=g}}
     if(!best)return;const g=best;
-    const label=g.lv<0?'Next generation':g.lv===0?'You':g.lv===1?'Parents':g.lv===2?'Grandparents':g.lv===3?'Great-grandparents':(g.lv-2)+'× great-grandparents';
+    const label='Generation '+(g.lv-L.gens[0].lv+1);
     const txt=label+(g.yr?' · c. '+g.yr:'');ctx.font='600 15px "Cormorant Garamond",Georgia,serif';
     const w=ctx.measureText(txt).width+24,x=10,y=document.querySelector('.bar').getBoundingClientRect().bottom+8;
     ctx.fillStyle='rgba(251,244,228,.95)';rr(x,y,w,30,15);ctx.fill();ctx.strokeStyle='rgba(90,69,32,.55)';ctx.lineWidth=1.2;ctx.stroke();
@@ -758,9 +755,9 @@ function drawGenLabels(s){
   ctx.fillStyle=gr;ctx.fillRect(0,0,railW,VH);
   const step=rowPx<44?3:rowPx<70?2:1;
   for(const g of L.gens){
-    if(g.lv%step)continue;
+    if((g.lv-L.gens[0].lv)%step)continue;
     const sy=(g.y+H/2-view.y)*s;if(sy<topH()+24||sy>VH-70)continue;
-    const label=g.lv<0?'Next generation':g.lv===0?'You':g.lv===1?'Parents':g.lv===2?'Grandparents':g.lv===3?'Great-grandparents':(g.lv-2)+'× great-grandparents';
+    const label='Generation '+(g.lv-L.gens[0].lv+1);
     ctx.strokeStyle='rgba(90,69,32,.35)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(14,sy+18);ctx.lineTo(railW-40,sy+18);ctx.stroke();
     ctx.fillStyle=COL.ink2;ctx.font='400 13px "Marcellus SC",serif';ctx.fillText(label,16,sy-2);
     if(g.yr){ctx.font='italic 600 15px "Cormorant Garamond",serif';ctx.fillStyle='#7a5c1c';ctx.fillText('c. '+g.yr,16,sy+14)}
@@ -838,7 +835,7 @@ const zc=f=>{const t=Math.max(minS(),Math.min(2.2,view.s*f));const cx=view.x+VW/
 document.getElementById('zin').onclick=()=>zc(1.8);document.getElementById('zout').onclick=()=>zc(1/1.8);
 document.getElementById('zfit').onclick=()=>fitAll();document.getElementById('zhome').onclick=()=>{closePanel();home()};
 function roleWord(n){return n.role==='F'?'father in the line':n.role==='M'?'mother in the line':n.role==='R'?'':n.role==='P'?'married or partnered in':n.role==='D'?'next generation':'brother or sister'}
-function genWord(lv){return lv<0?'next generation':lv===0?'your generation':lv===1?'parents':lv===2?'grandparents':lv===3?'great-grandparents':(lv-2)+' times great-grandparents'}
+function genWord(lv){return 'generation '+(lv-L.gens[0].lv+1)}
 function focusPerson(n,announce=true){kbd=n;dirty=true;
   const sx=(n.x+W/2-view.x)*view.s,sy=(n.y+H/2-view.y)*view.s,pad=80;
   if(sx<pad||sx>VW-pad-(panel.classList.contains('on')&&!isSheet()?410:0)||sy<120||sy>VH-(panel.classList.contains('on')&&isSheet()?VH*0.72:pad))flyTo(n,panel.classList.contains('on'));
@@ -1117,7 +1114,6 @@ function prep(lay){
   return lay;
 }
 document.querySelectorAll('#treeSeg button').forEach(b=>b.onclick=()=>setTree(b.dataset.tree));
-document.getElementById('sibTog').onclick=e=>{showSibs=!showSibs;e.currentTarget.setAttribute('aria-checked',showSibs);say(showSibs?'Brothers and sisters shown':'Brothers and sisters hidden. Showing the direct line only.');kbd=null;const c={x:view.x+VW/2/view.s,y:view.y+VH/2/view.s};relayout();dirty=true;home(false)};
 addEventListener('hashchange',()=>{const k=location.hash.slice(1);if((k==='kotze'||k==='tillett')&&k!==tree)setTree(k)});
 
 /* ================= boot ================= */
