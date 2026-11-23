@@ -286,7 +286,7 @@ kbd{font-family:inherit;font-weight:700;border:1.5px solid var(--line);border-bo
 </header>
 <canvas id="cv" tabindex="0" role="application" aria-roledescription="family tree" aria-label="Family tree" aria-describedby="cvhelp"></canvas>
 <p id="cvhelp" class="sr-only">Use the arrow keys to move between people: up to their parents, down to their children, left and right along the same generation. Press Enter to read about the selected person. Hold Shift with the arrow keys to pan, plus and minus to zoom, H to return home, 0 to see the whole tree. Or use the search box to find someone by name.</p>
-<div class="hint" id="hint" aria-hidden="true">Generation 1 is the youngest · older generations rise upward · drag to wander · tap anyone to meet them</div>
+<div class="hint" id="hint" aria-hidden="true">Generation 1 is the oldest, at the top · drag to wander · tap anyone to meet them</div>
 
 <div class="zoom" role="group" aria-label="Map controls">
   <button id="zin" title="Zoom in" aria-label="Zoom in"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.5v13M3.5 10h13" fill="none" stroke="#5a4520" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -746,7 +746,7 @@ function drawGenLabels(s){
   if(!railW){ // compact chip: which generation is in the middle of the screen
     const cy=view.y+VH*0.45/s;let best=null,bd=1e9;for(const g of L.gens){const d=Math.abs(g.y+H/2-cy);if(d<bd){bd=d;best=g}}
     if(!best)return;const g=best;
-    const label='Generation '+(g.lv-L.gens[0].lv+1);
+    const label='Generation '+(L.maxlv-g.lv+1);
     const txt=label+(g.yr?' · c. '+g.yr:'');ctx.font='600 15px "Cormorant Garamond",Georgia,serif';
     const w=ctx.measureText(txt).width+24,x=10,y=document.querySelector('.bar').getBoundingClientRect().bottom+8;
     ctx.fillStyle='rgba(251,244,228,.95)';rr(x,y,w,30,15);ctx.fill();ctx.strokeStyle='rgba(90,69,32,.55)';ctx.lineWidth=1.2;ctx.stroke();
@@ -755,9 +755,9 @@ function drawGenLabels(s){
   ctx.fillStyle=gr;ctx.fillRect(0,0,railW,VH);
   const step=rowPx<44?3:rowPx<70?2:1;
   for(const g of L.gens){
-    if((g.lv-L.gens[0].lv)%step)continue;
+    if((L.maxlv-g.lv)%step)continue;
     const sy=(g.y+H/2-view.y)*s;if(sy<topH()+24||sy>VH-70)continue;
-    const label='Generation '+(g.lv-L.gens[0].lv+1);
+    const label='Generation '+(L.maxlv-g.lv+1);
     ctx.strokeStyle='rgba(90,69,32,.35)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(14,sy+18);ctx.lineTo(railW-40,sy+18);ctx.stroke();
     ctx.fillStyle=COL.ink2;ctx.font='400 13px "Marcellus SC",serif';ctx.fillText(label,16,sy-2);
     if(g.yr){ctx.font='italic 600 15px "Cormorant Garamond",serif';ctx.fillStyle='#7a5c1c';ctx.fillText('c. '+g.yr,16,sy+14)}
@@ -835,7 +835,7 @@ const zc=f=>{const t=Math.max(minS(),Math.min(2.2,view.s*f));const cx=view.x+VW/
 document.getElementById('zin').onclick=()=>zc(1.8);document.getElementById('zout').onclick=()=>zc(1/1.8);
 document.getElementById('zfit').onclick=()=>fitAll();document.getElementById('zhome').onclick=()=>{closePanel();home()};
 function roleWord(n){return n.role==='F'?'father in the line':n.role==='M'?'mother in the line':n.role==='R'?'':n.role==='P'?'married or partnered in':n.role==='D'?'next generation':'brother or sister'}
-function genWord(lv){return 'generation '+(lv-L.gens[0].lv+1)}
+function genWord(lv){return 'generation '+(L.maxlv-lv+1)}
 function focusPerson(n,announce=true){kbd=n;dirty=true;
   const sx=(n.x+W/2-view.x)*view.s,sy=(n.y+H/2-view.y)*view.s,pad=80;
   if(sx<pad||sx>VW-pad-(panel.classList.contains('on')&&!isSheet()?410:0)||sy<120||sy>VH-(panel.classList.contains('on')&&isSheet()?VH*0.72:pad))flyTo(n,panel.classList.contains('on'));
